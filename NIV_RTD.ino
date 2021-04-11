@@ -1,7 +1,8 @@
-#include <Adafruit_MAX31865.h>
-
+#include "global.h"
 #include "sd.h"
 #include "rtc.h"
+#include "wifi.h"
+#include "data.h"
 
 Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 14, 12, 13);
 
@@ -9,13 +10,22 @@ Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 14, 12, 13);
 
 #define RNOMINAL 100.0
 
+float temperature;
+
 void setup() {
   Serial.begin(115200);
   Serial.println("Adafruit MAX31865 PT100 Sensor Test!");
 
   thermo.begin(MAX31865_3WIRE);
-  rtcBegin();
-  /* sdBegin(); */
+  uint8_t err;
+  err = rtcBegin();
+  err += sdBegin();
+  if(checkWifi()) {
+    Serial.println("Wifi Connected.");
+  }
+  if(err) {
+  while(1);
+  }
 }
 
 void loop() {
@@ -23,6 +33,7 @@ void loop() {
 
   Serial.println();
   Serial.println(thermo.temperature(RNOMINAL, RREF));
+  temperature =thermo.temperature(RNOMINAL, RREF);
 
   uint8_t fault = thermo.readFault();
   if (fault) {
@@ -49,14 +60,8 @@ void loop() {
   }
   Serial.println();
   DateTime n = getTime();
-  Serial.print(n.hour());
-  Serial.print(":");
-  Serial.print(n.minute());
-  Serial.print(":");
-  Serial.print(n.second());
-  Serial.println();
-  Serial.print("unixtime: ");
   Serial.print(n.unixtime());
   Serial.println();
+  storeData(n.unixtime(), temperature);
   delay(1000);
 }

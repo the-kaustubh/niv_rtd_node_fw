@@ -1,6 +1,7 @@
 #ifndef _LOG_H
 #define _LOG_H
 
+#include "global.h"
 #include <SD.h>
 #include <FS.h>
 
@@ -9,11 +10,12 @@
 #define FILE_SAVE ("/temperature")
 
 int sdBegin() {
-  if(SD.begin(CS_PIN)) {
+  if(!SD.begin(CS_PIN)) {
     Serial.println("Card Mount Failed");
-    return 0;
+    return 1;
   }
-  return 1;
+  Serial.println("SD Card mounted successfully.");
+  return 0;
 }
 
 int writeReading(uint32_t tstamp, float reading) {
@@ -24,6 +26,7 @@ int writeReading(uint32_t tstamp, float reading) {
   }
   char tsr[20];
   sprintf(tsr, "%ld,%f\r\n", tstamp, reading);
+  Serial.println(tsr);
 
   int bytes_written = ts.print(tsr);
 	if(!bytes_written) {
@@ -54,5 +57,6 @@ String readAllTimestamps() {
   clearFile(FILE_SAVE);
 	return fmt;
 }
+
 
 #endif
