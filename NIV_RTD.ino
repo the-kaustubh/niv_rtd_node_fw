@@ -3,6 +3,7 @@
 #include "rtc.h"
 #include "wifi.h"
 #include "data.h"
+#include "routes.h"
 
 Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 14, 12, 13);
 
@@ -17,6 +18,7 @@ void setup() {
   Serial.println("Adafruit MAX31865 PT100 Sensor Test!");
 
   thermo.begin(MAX31865_3WIRE);
+  WiFi.begin("Galaxy", "pzzk3333");
   uint8_t err;
   err = rtcBegin();
   err += sdBegin();
@@ -24,11 +26,15 @@ void setup() {
     Serial.println("Wifi Connected.");
   }
   if(err) {
-  while(1);
+    while(1);
   }
+  server.begin();
+  server.on("/", handleRoot);
+  server.onNotFound(handleNotFound);
 }
 
 void loop() {
+  server.handleClient();
   uint16_t rtd = thermo.readRTD();
 
   Serial.println();

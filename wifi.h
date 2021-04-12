@@ -1,7 +1,7 @@
 #ifndef _WIFI_A_H
 #define _WIFI_A_H
 
-#define SSID ("Galaxy M514B85")
+#define SSID ("Galaxy")
 #define PASS ("pzzk3333")
 
 #include <WiFi.h>

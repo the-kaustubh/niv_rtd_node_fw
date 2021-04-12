@@ -1,3 +1,5 @@
+#ifndef _GLOBAL_H
+#define _GLOBAL_H
 #include <Adafruit_MAX31865.h>
 #include <HTTPClient.h>
 #include <WiFi.h>
@@ -7,5 +9,9 @@
 #define USER "kaustubh"
 
 #define PROT "http://"
-#define HOST "192.168.43.213:3000"
+#define HOST "192.168.155.127:3000"
 #define ENDPOINT "/write/reading"
+
+WebServer server(80);
+
+#endif
