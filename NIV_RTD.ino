@@ -4,6 +4,7 @@
 #include "wifi.h"
 #include "data.h"
 #include "routes.h"
+#include "mem.h"
 
 Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 14, 12, 13);
 
@@ -18,23 +19,38 @@ void setup() {
   Serial.println("Adafruit MAX31865 PT100 Sensor Test!");
 
   thermo.begin(MAX31865_3WIRE);
-  WiFi.begin("Galaxy", "pzzk3333");
-  uint8_t err;
-  err = rtcBegin();
+  EEPROM.begin(512);
+  uint8_t err = 0;
+  /* err += rtcBegin(); */
   err += sdBegin();
-  if(checkWifi()) {
-    Serial.println("Wifi Connected.");
-  }
+  checkWifi(1);
   if(err) {
     while(1);
+    Serial.println("There was an error");
   }
   server.begin();
   server.on("/", handleRoot);
+  server.on("/save", handleSave);
   server.onNotFound(handleNotFound);
+  Serial.println(WiFi.localIP());
+  checkEEPROM();
+  Serial.println();
+  Serial.print("SSID: ");
+  Serial.println(SSID);
+  Serial.print("PASS: ");
+  Serial.println(PASS);
+  Serial.print("UID: ");
+  Serial.println(UID);
+  Serial.print("USER: ");
+  Serial.println(USER);
+  Serial.print("HOST: ");
+  Serial.println(HOST);
+  Serial.println("===========");
 }
 
 void loop() {
   server.handleClient();
+  checkWifi(0);
   uint16_t rtd = thermo.readRTD();
 
   Serial.println();

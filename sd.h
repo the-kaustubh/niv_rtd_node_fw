@@ -18,14 +18,26 @@ int sdBegin() {
   return 0;
 }
 
+int readingsPresent() {
+  if (SD.exists(FILE_SAVE)) {
+    return 1;
+  }
+  return 0;
+}
+
 int writeReading(uint32_t tstamp, float reading) {
-  File ts = SD.open(FILE_SAVE, FILE_APPEND);
+  File ts;
+  char tsr[20];
+  if(readingsPresent()) {
+    ts = SD.open(FILE_SAVE, FILE_APPEND);
+  } else {
+    ts = SD.open(FILE_SAVE, FILE_WRITE);
+  }
   if ( !ts ) {
     Serial.println("Couldn't open File");
     return 0;
   }
-  char tsr[20];
-  sprintf(tsr, "%ld,%f\r\n", tstamp, reading);
+  snprintf(tsr, 20, "%ld,%2.2f\r\n", tstamp, reading);
   Serial.println(tsr);
 
   int bytes_written = ts.print(tsr);
@@ -34,6 +46,7 @@ int writeReading(uint32_t tstamp, float reading) {
 	}
 	Serial.print(bytes_written);
 	Serial.println(" bytes were written.");
+	Serial.println("Closing file /temperature");
 	ts.close();
 }
 
@@ -57,6 +70,4 @@ String readAllTimestamps() {
   clearFile(FILE_SAVE);
 	return fmt;
 }
-
-
 #endif
