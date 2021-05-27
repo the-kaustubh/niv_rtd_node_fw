@@ -5,8 +5,9 @@
 #include "data.h"
 #include "routes.h"
 #include "mem.h"
-
-Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 14, 12, 13);
+#include "lcd.h"
+#include "temperature.h"
+/* #include "deep_sleep.h" */
 
 #define RREF 430.0
 
@@ -17,24 +18,25 @@ float temperature;
 void setup() {
   Serial.begin(115200);
   Serial.println("Adafruit MAX31865 PT100 Sensor Test!");
-
   thermo.begin(MAX31865_3WIRE);
   EEPROM.begin(512);
   uint8_t err = 0;
-  /* err += rtcBegin(); */
+  err += rtcBegin();
   err += sdBegin();
   checkWifi(1);
+  Serial.println();
   if(err) {
-    while(1);
+    /* while(1); */
     Serial.println("There was an error");
   }
   server.begin();
   server.on("/", handleRoot);
   server.on("/save", handleSave);
   server.onNotFound(handleNotFound);
+  Serial.println();
   Serial.println(WiFi.localIP());
   checkEEPROM();
-  Serial.println();
+  Serial.println("===========");
   Serial.print("SSID: ");
   Serial.println(SSID);
   Serial.print("PASS: ");
@@ -46,6 +48,11 @@ void setup() {
   Serial.print("HOST: ");
   Serial.println(HOST);
   Serial.println("===========");
+  /* esp_sleep_enable_timer_wakeup(TS * uS_to_S); */
+  /* Serial.println("Setup ESP32 to sleep for every " + String(TS) + */
+  /* " Seconds"); */
+  /* esp_deep_sleep_start(); */
+  
 }
 
 void loop() {
@@ -56,34 +63,13 @@ void loop() {
   Serial.println();
   Serial.println(thermo.temperature(RNOMINAL, RREF));
   temperature =thermo.temperature(RNOMINAL, RREF);
+  displayUpdate(temperature);
 
-  uint8_t fault = thermo.readFault();
-  if (fault) {
-    Serial.print("Fault 0x"); Serial.println(fault, HEX);
-    if (fault & MAX31865_FAULT_HIGHTHRESH) {
-      Serial.println("RTD High Threshold"); 
-    }
-    if (fault & MAX31865_FAULT_LOWTHRESH) {
-      Serial.println("RTD Low Threshold"); 
-    }
-    if (fault & MAX31865_FAULT_REFINLOW) {
-      Serial.println("REFIN- > 0.85 x Bias"); 
-    }
-    if (fault & MAX31865_FAULT_REFINHIGH) {
-      Serial.println("REFIN- < 0.85 x Bias - FORCE- open"); 
-    }
-    if (fault & MAX31865_FAULT_RTDINLOW) {
-      Serial.println("RTDIN- < 0.85 x Bias - FORCE- open"); 
-    }
-    if (fault & MAX31865_FAULT_OVUV) {
-      Serial.println("Under/Over voltage"); 
-    }
-    thermo.clearFault();
-  }
+  checkFault();
   Serial.println();
   DateTime n = getTime();
   Serial.print(n.unixtime());
   Serial.println();
   storeData(n.unixtime(), temperature);
-  delay(1000);
+  
 }

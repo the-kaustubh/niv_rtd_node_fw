@@ -2,7 +2,8 @@
 
 - [X] SD Card
 - [X] RTD
-- [ ] RTC
-- [ ] Web Request
-- [ ] LCD
+- [X] RTC
+- [X] Web Request
+- [X] LCD
+- [ ] Config Page
 
