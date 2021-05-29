@@ -20,21 +20,20 @@ void setup() {
   Serial.println("Adafruit MAX31865 PT100 Sensor Test!");
   thermo.begin(MAX31865_3WIRE);
   EEPROM.begin(512);
+  lcdSetup();
   uint8_t err = 0;
   err += rtcBegin();
   err += sdBegin();
   checkWifi(1);
   Serial.println();
   if(err) {
-    /* while(1); */
     Serial.println("There was an error");
+    while(1);
   }
   server.begin();
   server.on("/", handleRoot);
   server.on("/save", handleSave);
   server.onNotFound(handleNotFound);
-  Serial.println();
-  Serial.println(WiFi.localIP());
   checkEEPROM();
   Serial.println("===========");
   Serial.print("SSID: ");
@@ -48,6 +47,8 @@ void setup() {
   Serial.print("HOST: ");
   Serial.println(HOST);
   Serial.println("===========");
+  Serial.println();
+  Serial.println(WiFi.localIP());
   /* esp_sleep_enable_timer_wakeup(TS * uS_to_S); */
   /* Serial.println("Setup ESP32 to sleep for every " + String(TS) + */
   /* " Seconds"); */
