@@ -72,5 +72,6 @@ void loop() {
   Serial.print(n.unixtime());
   Serial.println();
   storeData(n.unixtime(), temperature);
+  delay(TS * 1000);
   
 }
