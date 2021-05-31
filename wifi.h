@@ -18,10 +18,11 @@ void checkWifi(int retry) {
           return;
         }
       }
-      if(WiFi.status() != WL_CONNECTED) {
-        WiFi.begin(DEF_SSID, DEF_PASS);
-      }
     }
+    if(WiFi.status() != WL_CONNECTED) {
+      WiFi.begin(DEF_SSID, DEF_PASS);
+    }
+    delay(1000);
     if(WiFi.status() == WL_CONNECTED) {
       Serial.print("Connected to Network: ");
       Serial.println(SSID);

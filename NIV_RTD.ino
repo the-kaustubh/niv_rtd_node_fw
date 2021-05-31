@@ -35,7 +35,7 @@ void setup() {
   server.on("/save", handleSave);
   server.onNotFound(handleNotFound);
   checkEEPROM();
-  Serial.println("===========");
+  Serial.println("=====EEPROM VALUES======");
   Serial.print("SSID: ");
   Serial.println(SSID);
   Serial.print("PASS: ");
@@ -46,7 +46,7 @@ void setup() {
   Serial.println(USER);
   Serial.print("HOST: ");
   Serial.println(HOST);
-  Serial.println("===========");
+  Serial.println("=======================");
   Serial.println();
   Serial.println(WiFi.localIP());
   /* esp_sleep_enable_timer_wakeup(TS * uS_to_S); */
@@ -58,8 +58,10 @@ void setup() {
 
 void loop() {
   server.handleClient();
-  checkWifi(0);
+  Serial.print("IP: ");
+  Serial.println(WiFi.localIP());
   uint16_t rtd = thermo.readRTD();
+  checkWifi(0);
 
   Serial.println();
   Serial.println(thermo.temperature(RNOMINAL, RREF));
