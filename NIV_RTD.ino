@@ -49,6 +49,11 @@ void setup() {
   Serial.println("=======================");
   Serial.println();
   Serial.println(WiFi.localIP());
+
+  if(!MDNS.begin("esp")) {
+     Serial.println("Error starting mDNS");
+     return;
+  }
   /* esp_sleep_enable_timer_wakeup(TS * uS_to_S); */
   /* Serial.println("Setup ESP32 to sleep for every " + String(TS) + */
   /* " Seconds"); */
@@ -65,7 +70,7 @@ void loop() {
 
   Serial.println();
   Serial.println(thermo.temperature(RNOMINAL, RREF));
-  temperature =thermo.temperature(RNOMINAL, RREF);
+  temperature = thermo.temperature(RNOMINAL, RREF);
   displayUpdate(temperature);
 
   checkFault();
@@ -75,5 +80,4 @@ void loop() {
   Serial.println();
   storeData(n.unixtime(), temperature);
   delay(TS * 1000);
-  
 }

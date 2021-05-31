@@ -20,8 +20,13 @@ void checkWifi(int retry) {
       }
     }
     if(WiFi.status() != WL_CONNECTED) {
+      Serial.println("Trying default Network");
       WiFi.begin(DEF_SSID, DEF_PASS);
+      while(WiFi.status() != WL_CONNECTED) {
+        Serial.print(".");
+      }
     }
+    Serial.println();
     delay(1000);
     if(WiFi.status() == WL_CONNECTED) {
       Serial.print("Connected to Network: ");
