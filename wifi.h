@@ -26,9 +26,9 @@ void checkWifi(int retry) {
       while(WiFi.status() != WL_CONNECTED) {
         Serial.print(".");
         times ++;
-        if(times > 50 ) break
+        if(times > 50 ) break;
       }
-      Serial.print("No Network")
+      Serial.print("No Network");
     }
     Serial.println();
     delay(1000);
