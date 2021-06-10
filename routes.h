@@ -29,12 +29,12 @@ const char CONF[] PROGMEM = "<!DOCTYPE html><html><head>"
 ".subm{background-color:#3498DB;color:#fff}</style></head>"
 "<body><form method='get' action='/save'>"
 "<div><h1> Configure </h1>"
-"<input name='ssid' placeholder='SSID'>"
-"<input name='pass' placeholder='Password'><hr>"
-"<input name='uid' placeholder='UID'>"
-"<input name='host' placeholder='URL'>"
-"<input name='user' placeholder='User'>"
-"<input name='ts' placeholder='Sampling time'>"
+"<input name='ssid' placeholder='SSID' value='__SSID__'>"
+"<input name='pass' placeholder='Password' value='__PASS__'><hr>"
+"<input name='uid' placeholder='UID' value='__UID__'>"
+"<input name='host' placeholder='URL' value='__HOST__'>"
+"<input name='user' placeholder='User' value='__USER__'>"
+"<input name='ts' placeholder='Sampling time' value='__TS__'>"
 "<input class='subm' type='submit' value=' OK '> <hr>"
 "</div></form</body></html>";
 
@@ -44,7 +44,14 @@ void printParam(const char * p) {
 
 
 void handleRoot() {
-  server.send(200, "text/html", CONF);
+  String Page = String(CONF);
+  Page.replace("__SSID__", SSID);
+  Page.replace("__PASS__", PASS);
+  Page.replace("__HOST__", HOST);
+  Page.replace("__UID__", UID);
+  Page.replace("__USER__", USER);
+  Page.replace("__TS__", String(TS));
+  server.send(200, "text/html", Page);
 
 }
 

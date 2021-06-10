@@ -88,12 +88,15 @@ uint8_t storeData(uint32_t ts, float temperature) {
       }
       ts.close();
       clearFile(FILE_SAVE);
+      Serial.println("Sent SD card data");
     } else {
       int resp = postRequest(temperature);
+      Serial.println("Sent live data");
       return resp;
     }
   } else {
     writeReading(ts, temperature);
+      Serial.println("Saved data to SD card");
     return 1;
   }
 }

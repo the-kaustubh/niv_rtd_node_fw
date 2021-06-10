@@ -6,6 +6,7 @@
 #include <WebServer.h>
 #include <LiquidCrystal_I2C.h>
 #include <EEPROM.h>
+#include <Wire.h>
 #include <ESPmDNS.h>
 
 #define DEF_UID "000000"

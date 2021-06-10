@@ -28,7 +28,7 @@ void setup() {
   Serial.println();
   if(err) {
     Serial.println("There was an error");
-    while(1);
+    /* while(1); */
   }
   server.begin();
   server.on("/", handleRoot);
