@@ -4,7 +4,7 @@
 #include "global.h"
 
 void lcdSetup() {
-  lcd.init();
+  lcd.begin();
   lcd.backlight();
 }
 

@@ -6,8 +6,8 @@
 void checkWifi(int retry) {
   if(WiFi.status() != WL_CONNECTED) {
     WiFi.begin(SSID.c_str(), PASS.c_str());
-    int times = 0;
     if(retry) {
+      int times = 0;
       while(WiFi.status() != WL_CONNECTED) {
         WiFi.begin(SSID.c_str(), PASS.c_str());
         Serial.print(".");
@@ -22,9 +22,13 @@ void checkWifi(int retry) {
     if(WiFi.status() != WL_CONNECTED) {
       Serial.println("Trying default Network");
       WiFi.begin(DEF_SSID, DEF_PASS);
+      int times = 0;
       while(WiFi.status() != WL_CONNECTED) {
         Serial.print(".");
+        times ++;
+        if(times > 50 ) break
       }
+      Serial.print("No Network")
     }
     Serial.println();
     delay(1000);
