@@ -70,7 +70,8 @@ void loop() {
 
   Serial.println();
   Serial.println(thermo.temperature(RNOMINAL, RREF));
-  temperature = thermo.temperature(RNOMINAL, RREF);
+  temperature = 30.0;
+  /* temperature = thermo.temperature(RNOMINAL, RREF); */
   displayUpdate(temperature);
 
   checkFault();

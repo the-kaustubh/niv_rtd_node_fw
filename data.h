@@ -77,6 +77,9 @@ uint8_t storeData(uint32_t ts, float temperature) {
       }
       while(ts.available()) {
         String f = ts.readStringUntil('\n');
+        if(f.length() < 4) {
+          break;
+        }
         uint32_t tstamp;
         float tem;
         sscanf(f.c_str(), "%ld,%f", &tstamp, &tem);
@@ -89,6 +92,7 @@ uint8_t storeData(uint32_t ts, float temperature) {
       ts.close();
       clearFile(FILE_SAVE);
       Serial.println("Sent SD card data");
+
     } else {
       int resp = postRequest(temperature);
       Serial.println("Sent live data");
