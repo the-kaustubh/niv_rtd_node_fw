@@ -69,6 +69,7 @@ int postRequest(float t) {
 uint8_t storeData(uint32_t ts, float temperature) {
   if(WiFi.status() == WL_CONNECTED) {
     if(readingsPresent()) {
+      Serial.println("Readings Present");
       File ts = SD.open(FILE_SAVE, FILE_READ);
       String fmt = "";
       if(!ts) {
@@ -76,8 +77,10 @@ uint8_t storeData(uint32_t ts, float temperature) {
         return 0;
       }
       while(ts.available()) {
+        Serial.println(ts.available());
         String f = ts.readStringUntil('\n');
         if(f.length() < 4) {
+          Serial.println("Readings Empty");
           break;
         }
         uint32_t tstamp;

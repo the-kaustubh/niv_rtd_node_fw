@@ -37,7 +37,7 @@ int writeReading(uint32_t tstamp, float reading) {
     Serial.println("Couldn't open File");
     return 0;
   }
-  snprintf(tsr, 20, "%ld,%2.2f\r\n", tstamp, reading);
+  snprintf(tsr, 20, "%ld,%2.2f\n", tstamp, reading);
   Serial.println(tsr);
 
   int bytes_written = ts.print(tsr);
@@ -52,8 +52,6 @@ int writeReading(uint32_t tstamp, float reading) {
 
 int clearFile(const char * file) {
   SD.remove(file);
-  File x = SD.open(file, FILE_WRITE);
-  x.close();
 }
 
 String readAllTimestamps() {

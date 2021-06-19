@@ -9,6 +9,7 @@
 #include "temperature.h"
 /* #include "deep_sleep.h" */
 
+#define DEBUG
 #define RREF 430.0
 
 #define RNOMINAL 100.0
@@ -28,7 +29,9 @@ void setup() {
   Serial.println();
   if(err) {
     Serial.println("There was an error");
-    /* while(1); */
+    #ifndef DEBUG
+    while(1);
+    #endif
   }
   server.begin();
   server.on("/", handleRoot);
@@ -58,7 +61,7 @@ void setup() {
   /* Serial.println("Setup ESP32 to sleep for every " + String(TS) + */
   /* " Seconds"); */
   /* esp_deep_sleep_start(); */
-  
+
 }
 
 void loop() {
@@ -69,16 +72,25 @@ void loop() {
   checkWifi(0);
 
   Serial.println();
-  Serial.println(thermo.temperature(RNOMINAL, RREF));
+  #ifdef DEBUG
   temperature = 30.0;
-  /* temperature = thermo.temperature(RNOMINAL, RREF); */
+  #else
+  temperature = thermo.temperature(RNOMINAL, RREF);
+  #endif
+
+  Serial.println(temperature);
   displayUpdate(temperature);
 
   checkFault();
   Serial.println();
   DateTime n = getTime();
-  Serial.print(n.unixtime());
-  Serial.println();
-  storeData(n.unixtime(), temperature);
+  uint32_t ts = 0;
+  #ifdef DEBUG
+  ts = 1623718150;
+  #else
+  ts = n.unixtime();
+  #endif
+
+  storeData(ts, temperature);
   delay(TS * 1000);
 }

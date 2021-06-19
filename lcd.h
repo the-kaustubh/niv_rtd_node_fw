@@ -15,9 +15,12 @@ void displayUpdate(float temperature) {
   lcd.print(" ");
   lcd.print(HOST);
   lcd.setCursor(0, 1);
+  lcd.print("UID: ");
   lcd.print(UID);
   lcd.print(" ");
+  lcd.print("T: ");
   lcd.print(temperature);
+  lcd.print(" deg");
 
   lcd.display();
 }
