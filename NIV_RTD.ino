@@ -15,6 +15,7 @@
 #define RNOMINAL 100.0
 
 float temperature;
+uint32_t rtd;
 
 void setup() {
   Serial.begin(115200);
@@ -61,6 +62,9 @@ void setup() {
   /* Serial.println("Setup ESP32 to sleep for every " + String(TS) + */
   /* " Seconds"); */
   /* esp_deep_sleep_start(); */
+  delay(10000);
+  uint16_t rtd = thermo.readRTD();
+  delay(10000);
 
 }
 
@@ -68,7 +72,6 @@ void loop() {
   server.handleClient();
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
-  uint16_t rtd = thermo.readRTD();
   checkWifi(0);
 
   Serial.println();
