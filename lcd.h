@@ -11,16 +11,22 @@ void lcdSetup() {
 void displayUpdate(float temperature) {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(WiFi.localIP());
-  lcd.print(" ");
-  lcd.print(HOST);
-  lcd.setCursor(0, 1);
-  lcd.print("UID: ");
+  lcd.print("Device UID: ");
   lcd.print(UID);
-  lcd.print(" ");
+  lcd.setCursor(0, 1);
   lcd.print("T: ");
   lcd.print(temperature);
-  lcd.print(" deg");
+  lcd.print(" Celsius");
+  lcd.print(" ");
+  lcd.setCursor(0, 2);
+  if(WiFi.status() == WL_CONNECTED) {
+    lcd.print("N/W OK");
+  } else {
+    lcd.print("Offline");
+  }
+  lcd.print(" ");
+  lcd.setCursor(0, 3);
+  lcd.print(WiFi.localIP());
 
   lcd.display();
 }

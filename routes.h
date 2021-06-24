@@ -67,7 +67,7 @@ void handleSave() {
   SAVE_PARAM("user",  updateUSER);
   SAVE_PARAM("ts",   updateTS);
 
-  server.send(201, "text/html", "Your config was saved <a hreaf='/'>Go back</a>");
+  server.send(201, "text/html", "Your config was saved <a href='/'>Go back</a>");
   ESP.restart();
 
 }
