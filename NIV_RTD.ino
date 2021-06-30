@@ -7,6 +7,7 @@
 #include "mem.h"
 #include "lcd.h"
 #include "temperature.h"
+#include "ndir_co2.h"
 /* #include "deep_sleep.h" */
 
 #define DEBUG
@@ -14,8 +15,9 @@
 
 #define RNOMINAL 100.0
 
-float temperature;
+float temperature, co2;
 uint32_t rtd;
+uint8_t BUZZER_PIN = 27;
 
 void setup() {
   Serial.begin(115200);
@@ -26,6 +28,7 @@ void setup() {
   uint8_t err = 0;
   err += rtcBegin();
   err += sdBegin();
+  err += !co2Sensor.begin();
   checkWifi(1);
   Serial.println();
   if(err) {
@@ -58,13 +61,13 @@ void setup() {
      Serial.println("Error starting mDNS");
      return;
   }
+
   /* esp_sleep_enable_timer_wakeup(TS * uS_to_S); */
   /* Serial.println("Setup ESP32 to sleep for every " + String(TS) + */
   /* " Seconds"); */
   /* esp_deep_sleep_start(); */
-  delay(10000);
+  delay(20000);
   uint16_t rtd = thermo.readRTD();
-  delay(10000);
 
 }
 
@@ -81,11 +84,18 @@ void loop() {
   temperature = thermo.temperature(RNOMINAL, RREF);
   #endif
 
+  if(co2Sensor.measure()) {
+    co2 = co2Sensor.ppm;
+  } else {
+    Serial.println("Error: Sensor Communication Error in CO2");
+  }
+
   Serial.println(temperature);
   displayUpdate(temperature);
 
   checkFault();
   Serial.println();
+
   DateTime n = getTime();
   uint32_t ts = 0;
   #ifdef DEBUG
@@ -94,6 +104,6 @@ void loop() {
   ts = n.unixtime();
   #endif
 
-  storeData(ts, temperature);
+  storeData(ts, temperature, co2);
   delay(TS * 1000);
 }

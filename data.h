@@ -3,7 +3,7 @@
 
 #include "global.h"
 
-int postRequestWithTS(float t, uint32_t ts) {
+int postRequestWithTS(float t, float co2, uint32_t ts) {
 
   char postdata[200];
   HTTPClient http;
@@ -18,7 +18,7 @@ int postRequestWithTS(float t, uint32_t ts) {
       "\"temperature\":\"%0.2f\","
       "\"user\":\"%s\","
       "\"humidity\":\"0\","
-      "\"co2\":\"0\","
+      "\"co2\":\"%0.2f\","
       "\"pressure\":\"0\","
       "\"backup\": \"1\","
       "\"datetime\": \"%ld\""
@@ -26,6 +26,7 @@ int postRequestWithTS(float t, uint32_t ts) {
       UID,
       t,
       USER,
+      co2,
       ts
       );
 
@@ -38,7 +39,7 @@ int postRequestWithTS(float t, uint32_t ts) {
   return resp;
 }
 
-int postRequest(float t) {
+int postRequest(float t, float co2) {
 
   char postdata[100];
   HTTPClient http;
@@ -46,16 +47,17 @@ int postRequest(float t) {
   Serial.println(PROT + HOST + ENDPOINT);
   http.addHeader("Content-Type", "application/json");
 
-  sprintf(postdata, 
+  sprintf(postdata,
       "{\"uid\":\"%s\","
       "\"temperature\":\"%0.2f\","
       "\"user\":\"%s\","
       "\"humidity\":\"0\","
-      "\"co2\":\"0\","
+      "\"co2\":\"%0.2f\","
       "\"pressure\":\"0\"}",
       UID,
       t,
-      USER
+      USER,
+      co2
       );
 
   Serial.println(postdata);
@@ -66,7 +68,7 @@ int postRequest(float t) {
   return resp;
 }
 
-uint8_t storeData(uint32_t ts, float temperature) {
+uint8_t storeData(uint32_t ts, float temperature, float co2) {
   if(WiFi.status() == WL_CONNECTED) {
     if(readingsPresent()) {
       Serial.println("Readings Present");
@@ -85,25 +87,26 @@ uint8_t storeData(uint32_t ts, float temperature) {
         }
         uint32_t tstamp;
         float tem;
-        sscanf(f.c_str(), "%ld,%f", &tstamp, &tem);
+        float t_co2;
+        sscanf(f.c_str(), "%ld,%f,%f", &tstamp, &tem, &t_co2);
         Serial.print("Tstamp");
         Serial.println(tstamp);
         Serial.print("Temp");
         Serial.println(tem);
-        postRequestWithTS(tem, tstamp);
+        postRequestWithTS(tem, t_co2, tstamp);
       }
       ts.close();
       clearFile(FILE_SAVE);
       Serial.println("Sent SD card data");
 
     } else {
-      int resp = postRequest(temperature);
+      int resp = postRequest(temperature, co2);
       Serial.println("Sent live data");
       return resp;
     }
   } else {
-    writeReading(ts, temperature);
-      Serial.println("Saved data to SD card");
+    writeReading(ts, temperature, co2);
+    Serial.println("Saved data to SD card");
     return 1;
   }
 }

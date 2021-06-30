@@ -25,9 +25,9 @@ int readingsPresent() {
   return 0;
 }
 
-int writeReading(uint32_t tstamp, float reading) {
+int writeReading(uint32_t tstamp, float temperature, float co2) {
   File ts;
-  char tsr[20];
+  char tsr[30];
   if(readingsPresent()) {
     ts = SD.open(FILE_SAVE, FILE_APPEND);
   } else {
@@ -37,7 +37,7 @@ int writeReading(uint32_t tstamp, float reading) {
     Serial.println("Couldn't open File");
     return 0;
   }
-  snprintf(tsr, 20, "%ld,%2.2f\n", tstamp, reading);
+  snprintf(tsr, 30, "%ld,%2.2f,%2.2f\n", tstamp, temperature, co2);
   Serial.println(tsr);
 
   int bytes_written = ts.print(tsr);

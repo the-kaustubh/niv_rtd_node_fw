@@ -7,6 +7,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <EEPROM.h>
 #include <Wire.h>
+#include <NDIR_SoftwareSerial.h>
 #include <ESPmDNS.h>
 
 #define DEF_UID "000000"
