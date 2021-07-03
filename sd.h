@@ -7,7 +7,7 @@
 
 #define CS_PIN (5)
 
-#define FILE_SAVE ("/temperature")
+#define FILE_SAVE ("/readings")
 
 int sdBegin() {
   if(!SD.begin(CS_PIN)) {
@@ -25,9 +25,9 @@ int readingsPresent() {
   return 0;
 }
 
-int writeReading(uint32_t tstamp, float temperature, float co2) {
+int writeReading(uint32_t tstamp, float temperature, float co2, float hum) {
   File ts;
-  char tsr[30];
+  char tsr[40];
   if(readingsPresent()) {
     ts = SD.open(FILE_SAVE, FILE_APPEND);
   } else {
@@ -37,7 +37,7 @@ int writeReading(uint32_t tstamp, float temperature, float co2) {
     Serial.println("Couldn't open File");
     return 0;
   }
-  snprintf(tsr, 30, "%ld,%2.2f,%2.2f\n", tstamp, temperature, co2);
+  snprintf(tsr, 40, "%ld,%2.2f,%2.2f,%2.2f\n", tstamp, temperature, co2, hum);
   Serial.println(tsr);
 
   int bytes_written = ts.print(tsr);
@@ -46,7 +46,7 @@ int writeReading(uint32_t tstamp, float temperature, float co2) {
 	}
 	Serial.print(bytes_written);
 	Serial.println(" bytes were written.");
-	Serial.println("Closing file /temperature");
+	Serial.println("Closing file /readings");
 	ts.close();
 }
 
