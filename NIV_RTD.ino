@@ -10,7 +10,7 @@
 
 #define RTD_NODE
 /* #define DHT_NODE */
-/* #define CO2_NODE */
+#define CO2_NODE
 
 
 #ifdef CO2_NODE
@@ -27,7 +27,11 @@ float dht_temp, dht_hum;
 #define RREF 430.0
 #define RNOMINAL 100.0
 uint32_t rtd;
-float temperature, co2;
+float temperature;
+#endif
+
+#ifdef CO2_NODE
+float co2;
 #endif
 
 #define DEBUG

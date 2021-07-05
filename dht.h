@@ -7,7 +7,7 @@ void DHT_init() {
   dht.begin();
 }
 
-void getValuesDHT(float * t, float * h) {
+int getValuesDHT(float * t, float * h) {
   float _h = dht.readHumidity();
   float _t = dht.readTemperature();
   if(isnan(_h) || isnan(_t)) {
