@@ -36,7 +36,7 @@ float co2;
 
 #define DEBUG
 
-#define BUZZER_PIN (27)
+#define BUZZER_PIN (33)
 
 void setup() {
   Serial.begin(115200);
