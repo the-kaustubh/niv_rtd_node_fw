@@ -4,7 +4,7 @@
 #include "global.h"
 
 void DHT_init() {
-  dht.begin();
+  dht.begin(DHTPIN, DHTTYPE);
 }
 
 int getValuesDHT(float * t, float * h) {

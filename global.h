@@ -26,6 +26,11 @@
 #define DHTTYPE DHT11
 #define DHTPIN (34)
 
+#define BATTERY_IN (25)
+#define BATTERY_CS (26)
+
+#define BUZZER_PIN (33)
+
 WebServer server(80);
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 String SSID, PASS;
@@ -33,6 +38,5 @@ String HOST, UID, USER;
 Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 14, 12, 13);
 DHT dht(DHTPIN, DHTTYPE);
 uint16_t TS;
-
 
 #endif
