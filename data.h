@@ -42,13 +42,13 @@ int postRequestWithTS(float t, float co2, float hum, uint32_t ts) {
 
 int postRequest(float t, float co2, float hum) {
 
-  char postdata[100];
+  char postdata[200];
   HTTPClient http;
   http.begin(PROT + HOST + ENDPOINT);
   Serial.println(PROT + HOST + ENDPOINT);
   http.addHeader("Content-Type", "application/json");
 
-  sprintf(postdata,
+  snprintf(postdata, 200,
       "{\"uid\":\"%s\","
       "\"user\":\"%s\","
       "\"temperature\":\"%0.2f\","
