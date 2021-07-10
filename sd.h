@@ -6,6 +6,7 @@
 #include <FS.h>
 
 #define CS_PIN (5)
+// 13 19 18 5
 
 #define FILE_SAVE ("/readings")
 

@@ -14,7 +14,7 @@
 
 
 #ifdef CO2_NODE
-#include "ndir_co2.h"
+#include "mh_z16_co2.h"
 #endif
 
 #ifdef DHT_NODE
@@ -51,7 +51,7 @@ void setup() {
   err += sdBegin();
 
 #ifdef CO2_NODE
-  err += !co2Sensor.begin();
+  co2Sensor.begin(UART2_RX, UART2_TX);
 #endif
 
   checkWifi(1);
@@ -119,8 +119,8 @@ void loop() {
 #endif
 
 #ifdef CO2_NODE
-  if(co2Sensor.measure()) {
-    co2 = co2Sensor.ppm;
+  if(!co2Sensor.isWarming()) {
+    co2 = co2Sensor.getPPM();
   } else {
     Serial.println("Error: Sensor Communication Error in CO2");
   }

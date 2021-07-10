@@ -7,7 +7,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <EEPROM.h>
 #include <Wire.h>
-#include <NDIR_SoftwareSerial.h>
+#include <MHZ16_uart.h>
 #include <DHT.h>
 #include <ESPmDNS.h>
 
@@ -24,12 +24,12 @@
 #define uS_to_S (1000000)
 
 #define DHTTYPE DHT11
-#define DHTPIN (34)
+#define DHTPIN (4)
 
 #define BATTERY_IN (25)
 #define BATTERY_CS (26)
 
-#define BUZZER_PIN (33)
+#define BUZZER_PIN (34)
 
 WebServer server(80);
 LiquidCrystal_I2C lcd(0x27, 20, 4);
