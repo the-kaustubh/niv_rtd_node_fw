@@ -40,7 +40,7 @@ int postRequestWithTS(float t, float co2, float hum, uint32_t ts) {
   return resp;
 }
 
-int postRequest(float t, float co2, float hum) {
+int postRequest(float t, float co2, float hum, float bat) {
 
   char postdata[200];
   HTTPClient http;
@@ -55,11 +55,13 @@ int postRequest(float t, float co2, float hum) {
       "\"humidity\":\"%0.2f\","
       "\"co2\":\"%0.2f\","
       "\"pressure\":\"0\"}",
+      "\"battery\":\"%0.2f\"}",
       UID,
       USER,
       t,
       hum,
-      co2
+      co2,
+      bat
       );
 
   Serial.println(postdata);
@@ -70,7 +72,7 @@ int postRequest(float t, float co2, float hum) {
   return resp;
 }
 
-uint8_t storeData(uint32_t ts, float temperature, float co2, float hum) {
+uint8_t storeData(uint32_t ts, float temperature, float co2, float hum, float battery) {
   if(WiFi.status() == WL_CONNECTED) {
     if(readingsPresent()) {
       Serial.println("Readings Present");
@@ -97,7 +99,7 @@ uint8_t storeData(uint32_t ts, float temperature, float co2, float hum) {
       Serial.println("Sent SD card data");
 
     } else {
-      int resp = postRequest(temperature, co2, hum);
+      int resp = postRequest(temperature, co2, hum, battery);
       Serial.println("Sent live data");
       return resp;
     }

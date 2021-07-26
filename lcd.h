@@ -8,7 +8,7 @@ void lcdSetup() {
   lcd.backlight();
 }
 
-void displayUpdate(float temperature, float humidity, float co2, float pressure) {
+void displayUpdate(float temperature, float humidity, float co2, float pressure, float battery) {
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Device UID: ");
@@ -46,6 +46,9 @@ void displayUpdate(float temperature, float humidity, float co2, float pressure)
   lcd.print(" P: ");
   lcd.print(pressure);
   // =======
+  lcd.setCursor(0, 4);
+  lcd.print("BAT: ");
+  lcd.print(battery);
 
   lcd.display();
 }

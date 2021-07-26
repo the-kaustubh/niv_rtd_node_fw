@@ -29,9 +29,9 @@ float temperature;
 float co2;
 #endif
 
-#define DEBUG
+/* #define DEBUG */
 
-#define BUZZER_PIN (33)
+float battery = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -96,6 +96,9 @@ void setup() {
   rtd = thermo.readRTD();
 #endif
 
+  pinMode(BATTERY_CS, OUTPUT);
+  pinMode(BATTERY_IN, INPUT);
+
 }
 
 void loop() {
@@ -123,11 +126,37 @@ void loop() {
 
 #ifdef RTD_NODE
   Serial.println(temperature);
-  displayUpdate(temperature);
-
   checkFault();
   Serial.println();
 #endif
+
+  displayUpdate(
+      // Temperature and Humidity
+#if defined(RTD_NODE)
+      temperature,
+      0,
+#elif defined(DHT_NODE)
+      dht_temp,
+      dht_hum,
+#endif
+
+      // CO2
+#if defined(CO2_NODE)
+      co2,
+#else
+      0,
+#endif
+
+      // Pressure
+      0,
+      battery
+      );
+
+  // Battery Reading
+  digitalWrite(BATTERY_CS, HIGH);
+  battery = analogRead(BATTERY_IN);
+  delay(200);
+  digitalWrite(BATTERY_CS, LOW);
 
 #ifdef DHT_NODE
   getValuesDHT(&dht_temp, &dht_hum);
@@ -160,21 +189,10 @@ void loop() {
 #else
       0.0
 #endif
+      ,
+      battery
       );
 
-  /* #ifdef CO2_NODE */
-  /* #ifdef DHT_NODE */
-  /* storeData(ts, dht_temp, co2, dht_hum); */
-  /* #else */
-  /* storeData(ts, temperature, co2, 0f); */
-  /* #endif */
-  /* #else */
-  /* #ifdef DHT_NODE */
-  /* storeData(ts, dht_temp, 0, dht_hum); */
-  /* #else */
-  /* storeData(ts, temperature, 0, 0); */
-  /* #endif */
-  /* #endif */
 
   delay(TS * 1000);
 }

@@ -14,6 +14,7 @@
 #define RTD_NODE
 /* #define DHT_NODE */
 #define CO2_NODE
+
 #define DEF_UID "000000"
 #define DEF_USER "kaustubh"
 
@@ -32,7 +33,8 @@
 #define BATTERY_IN (25) // or 36
 #define BATTERY_CS (26)
 
-#define BUZZER_PIN (15)
+/* #define BUZZER_PIN (15) */
+#define BUZZER_PIN (33)
 
 WebServer server(80);
 LiquidCrystal_I2C lcd(0x27, 20, 4);
