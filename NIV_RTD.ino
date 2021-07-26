@@ -6,6 +6,7 @@
 #include "routes.h"
 #include "mem.h"
 #include "lcd.h"
+#include "battery.h"
 /* #include "deep_sleep.h" */
 
 #ifdef CO2_NODE
@@ -153,10 +154,7 @@ void loop() {
       );
 
   // Battery Reading
-  digitalWrite(BATTERY_CS, HIGH);
-  battery = analogRead(BATTERY_IN);
-  delay(200);
-  digitalWrite(BATTERY_CS, LOW);
+  battery = getBattery();
 
 #ifdef DHT_NODE
   getValuesDHT(&dht_temp, &dht_hum);
