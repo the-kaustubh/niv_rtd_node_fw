@@ -8,7 +8,7 @@ void lcdSetup() {
   lcd.backlight();
 }
 
-void displayUpdate(float temperature) {
+void displayUpdate(float temperature, float humidity, float co2, float pressure) {
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Device UID: ");
@@ -17,19 +17,34 @@ void displayUpdate(float temperature) {
   lcd.setCursor(0, 1);
   // =======
   if(WiFi.status() == WL_CONNECTED) {
-    lcd.print("N/W OK");
-    lcd.setCursor(0, 2);
+    lcd.print("N/W OK ");
     lcd.print(WiFi.localIP());
   } else {
     lcd.print("Offline");
   }
   // =======
-  lcd.setCursor(0, 3);
+  lcd.setCursor(0, 2);
   // =======
+#if defined(RTD_NODE)
   lcd.print("T: ");
   lcd.print(temperature);
-  lcd.print(" Celsius");
+  lcd.print(" C");
   lcd.print(" ");
+#elif defined(DHT_NODE)
+  lcd.print("T: ");
+  lcd.print(temperature);
+  lcd.print(" C H: ");
+  lcd.print(humidity);
+  lcd.print(" %");
+  lcd.print(" ");
+#endif
+  lcd.setCursor(0, 3);
+#if defined(CO2_NODE)
+  lcd.print("CO2: ");
+  lcd.print(co2);
+#endif
+  lcd.print(" P: ");
+  lcd.print(pressure);
   // =======
 
   lcd.display();

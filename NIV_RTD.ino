@@ -8,11 +8,6 @@
 #include "lcd.h"
 /* #include "deep_sleep.h" */
 
-#define RTD_NODE
-/* #define DHT_NODE */
-#define CO2_NODE
-
-
 #ifdef CO2_NODE
 #include "mh_z16_co2.h"
 #endif
