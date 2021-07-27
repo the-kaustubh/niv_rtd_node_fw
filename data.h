@@ -54,7 +54,7 @@ int postRequest(float t, float co2, float hum, float bat) {
       "\"temperature\":\"%0.2f\","
       "\"humidity\":\"%0.2f\","
       "\"co2\":\"%0.2f\","
-      "\"pressure\":\"0\"}",
+      "\"pressure\":\"0\"},"
       "\"battery\":\"%0.2f\"}",
       UID,
       USER,
