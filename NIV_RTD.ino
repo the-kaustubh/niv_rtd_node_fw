@@ -32,7 +32,7 @@ float co2;
 
 /* #define DEBUG */
 
-float battery = 0;
+int battery = 0;
 
 void setup() {
   Serial.begin(115200);

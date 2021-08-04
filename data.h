@@ -55,13 +55,13 @@ int postRequest(float t, float co2, float hum, float bat) {
       "\"humidity\":\"%0.2f\","
       "\"co2\":\"%0.2f\","
       "\"pressure\":\"0\","
-      "\"battery\":\"%0.2f\"}",
+      "\"battery\":\"%d\"}",
       UID,
       USER,
       t,
       hum,
       co2,
-      bat
+      bat%100
       );
 
   Serial.println(postdata);

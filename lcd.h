@@ -18,7 +18,7 @@ void displayUpdate(float temperature, float humidity, float co2, float pressure,
   // =======
   if(WiFi.status() == WL_CONNECTED) {
     lcd.print("N/W OK ");
-    lcd.print(WiFi.localIP());
+    /* lcd.print(WiFi.localIP()); */
   } else {
     lcd.print("Offline");
   }
@@ -43,10 +43,8 @@ void displayUpdate(float temperature, float humidity, float co2, float pressure,
   lcd.print("CO2: ");
   lcd.print(co2);
 #endif
-  lcd.print(" P: ");
-  lcd.print(pressure);
   // =======
-  lcd.setCursor(0, 4);
+  lcd.setCursor(0, 3);
   lcd.print("BAT: ");
   lcd.print(battery);
 
