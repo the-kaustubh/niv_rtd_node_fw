@@ -40,7 +40,7 @@ int postRequestWithTS(float t, float co2, float hum, uint32_t ts) {
   return resp;
 }
 
-int postRequest(float t, float co2, float hum, float bat) {
+int postRequest(float t, float co2, float hum, int bat) {
 
   char postdata[200];
   HTTPClient http;
