@@ -44,7 +44,6 @@ void displayUpdate(float temperature, float humidity, float co2, float pressure,
   lcd.print(co2);
 #endif
   // =======
-  lcd.setCursor(0, 3);
   lcd.print("BAT: ");
   lcd.print(battery);
 
