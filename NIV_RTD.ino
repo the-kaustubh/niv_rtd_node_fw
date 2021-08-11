@@ -33,6 +33,7 @@ float co2;
 /* #define DEBUG */
 
 int battery = 0;
+DateTime n;
 
 void setup() {
   Serial.begin(115200);
@@ -132,6 +133,8 @@ void loop() {
 #endif
 
   displayUpdate(
+      // Datetime
+      n,
       // Temperature and Humidity
 #if defined(RTD_NODE)
       temperature,
@@ -160,7 +163,7 @@ void loop() {
   getValuesDHT(&dht_temp, &dht_hum);
 #endif
 
-  DateTime n = getTime();
+  n = getTime();
   uint32_t ts = 0;
 #ifdef DEBUG
   ts = 1623718150;

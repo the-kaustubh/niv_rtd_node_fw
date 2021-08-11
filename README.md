@@ -5,5 +5,9 @@
 - [X] RTC
 - [X] Web Request
 - [X] LCD
-- [ ] Config Page
+- [X] Config Page
+
+Prob
+ - Fetching data from server in abscence of n/w
+ - 
 
