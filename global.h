@@ -11,6 +11,8 @@
 #include <DHT.h>
 #include <ESPmDNS.h>
 
+#include "ArduinoJson-v6.18.3.h"
+
 #define RTD_NODE
 /* #define DHT_NODE */
 #define CO2_NODE
@@ -43,5 +45,8 @@ String HOST, UID, USER;
 Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 14, 12, 13);
 DHT dht(DHTPIN, DHTTYPE);
 uint16_t TS;
+uint16_t TEMP_MIN, TEMP_MAX;
+uint16_t HUM_MIN, HUM_MAX;
+uint16_t CO2_MIN, CO2_MAX;
 
 #endif

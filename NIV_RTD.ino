@@ -7,6 +7,7 @@
 #include "mem.h"
 #include "lcd.h"
 #include "battery.h"
+#include "setpoints.h"
 /* #include "deep_sleep.h" */
 
 #ifdef CO2_NODE
@@ -68,6 +69,10 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/save", handleSave);
   server.onNotFound(handleNotFound);
+
+  // Load setpoints
+  fetchSetpoint();
+
   checkEEPROM();
   Serial.println("=====EEPROM VALUES======");
   Serial.print("SSID: ");
@@ -100,10 +105,12 @@ void setup() {
 
   pinMode(BATTERY_CS, OUTPUT);
   pinMode(BATTERY_IN, INPUT);
-
 }
 
 void loop() {
+  Serial.println(TEMP_MIN + " " + TEMP_MAX);
+  Serial.println(HUM_MIN + " " + HUM_MAX);
+  Serial.println(CO2_MIN + " " + CO2_MAX);
   server.handleClient();
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
@@ -115,12 +122,22 @@ void loop() {
   temperature = 30.0;
 #else
   temperature = thermo.temperature(RNOMINAL, RREF);
+  if(temperature > TEMP_MAX || temperature < TEMP_MIN) {
+    digitalWrite(BUZZER_PIN, HIGH);
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+  }
 #endif
 #endif
 
 #ifdef CO2_NODE
   if(!co2Sensor.isWarming()) {
     co2 = co2Sensor.getPPM();
+    if(co2 > CO2_MAX || co2 < CO2_MIN) {
+      digitalWrite(BUZZER_PIN, HIGH);
+    } else {
+      digitalWrite(BUZZER_PIN, LOW);
+    }
   } else {
     Serial.println("Error: Sensor Communication Error in CO2");
   }
@@ -133,8 +150,6 @@ void loop() {
 #endif
 
   displayUpdate(
-      // Datetime
-      n,
       // Temperature and Humidity
 #if defined(RTD_NODE)
       temperature,
@@ -161,6 +176,16 @@ void loop() {
 
 #ifdef DHT_NODE
   getValuesDHT(&dht_temp, &dht_hum);
+  if(dht_temp > TEMP_MAX || dht_temp < TEMP_MIN) {
+    digitalWrite(BUZZER_PIN, HIGH);
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+  }
+  if(dht_hum > HUM_MAX || dht_hum < HUM_MIN) {
+    digitalWrite(BUZZER_PIN, HIGH);
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+  }
 #endif
 
   n = getTime();

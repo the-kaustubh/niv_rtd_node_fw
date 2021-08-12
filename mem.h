@@ -12,6 +12,15 @@
 #define ADDR_SAMPLING_RATE (220)
 #define ADDR_EEPROM_CONFIG (280)
 
+#define TEMP_MIN_ADDR (300)
+#define TEMP_MAX_ADDR (302)
+
+#define CO2_MIN_ADDR (304)
+#define CO2_MAX_ADDR (306)
+
+#define HUM_MIN_ADDR (308)
+#define HUM_MAX_ADDR (310)
+
 void readEEPROM() {
   SSID = EEPROM.readString(ADDR_SSID);
   PASS = EEPROM.readString(ADDR_PASS);
@@ -19,6 +28,16 @@ void readEEPROM() {
   UID = EEPROM.readString(ADDR_UID);
   USER = EEPROM.readString(ADDR_USER);
   TS = EEPROM.readInt(ADDR_SAMPLING_RATE);
+
+  TEMP_MIN = EEPROM.readInt(TEMP_MIN_ADDR);
+  TEMP_MAX = EEPROM.readInt(TEMP_MAX_ADDR);
+
+  HUM_MIN = EEPROM.readInt(HUM_MIN_ADDR);
+  HUM_MAX = EEPROM.readInt(HUM_MAX_ADDR);
+
+  CO2_MIN = EEPROM.readInt(CO2_MIN_ADDR);
+  CO2_MAX = EEPROM.readInt(CO2_MAX_ADDR);
+
 }
 
 void checkEEPROM() {
@@ -58,6 +77,13 @@ void updateUSER(const char *i) {
 }
 void updateTS(const char *i) {
   EEPROM.writeInt(ADDR_SAMPLING_RATE, atoi(i));
+  EEPROM.commit();
+}
+
+void updateSetPoint(uint16_t addr, uint16_t min, uint16_t max) {
+  EEPROM.writeInt(addr, min);
+  EEPROM.writeInt(addr + 2, max);
+
   EEPROM.commit();
 }
 
