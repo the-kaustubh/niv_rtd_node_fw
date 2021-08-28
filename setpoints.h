@@ -17,6 +17,9 @@ void fetchSetpoint() {
 
   DynamicJsonDocument json(1024);
   deserializeJson(json, response);
+  Serial.println(json['temperaturemin'] + "," + json['temperaturemax']);
+  Serial.println(json['humiditymin'] + "," + json['humiditymax']);
+  Serial.println(json['co2min'] + "," + json['co2max']);
 
   updateSetPoint(TEMP_MIN_ADDR, json['temperaturemin'], json['temperaturemax']);
   updateSetPoint(HUM_MIN_ADDR, json['humiditymin'], json['humiditymax']);
