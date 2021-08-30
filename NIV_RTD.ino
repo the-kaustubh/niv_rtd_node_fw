@@ -70,9 +70,6 @@ void setup() {
   server.on("/save", handleSave);
   server.onNotFound(handleNotFound);
 
-  // Load setpoints
-  fetchSetpoint();
-
   checkEEPROM();
   Serial.println("=====EEPROM VALUES======");
   Serial.print("SSID: ");
@@ -105,6 +102,8 @@ void setup() {
 
   pinMode(BATTERY_CS, OUTPUT);
   pinMode(BATTERY_IN, INPUT);
+  // Load setpoints
+  fetchSetpoint();
 }
 
 void loop() {

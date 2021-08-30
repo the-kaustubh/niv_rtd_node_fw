@@ -6,8 +6,7 @@
 void fetchSetpoint() {
   HTTPClient http;
 
-  String url = PROT + HOST + "/write/setpoints/" + UID;
-  http.begin(url);
+  String url = PROT + HOST + "/write/setpoints/" + UID; http.begin(url);
   http.addHeader("Accept", "application/json");
 
   Serial.println(url);
