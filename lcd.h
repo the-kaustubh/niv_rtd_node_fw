@@ -4,11 +4,11 @@
 #include "global.h"
 
 void lcdSetup() {
-  lcd.init();
+  lcd.begin();
   lcd.backlight();
 }
 
-void displayUpdate(float temperature, float humidity, float co2, float pressure, float battery) {
+void displayUpdate(float temperature, float humidity, float co2,  float battery) {
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Device UID: ");

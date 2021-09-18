@@ -22,26 +22,23 @@
 #define HUM_MAX_ADDR (310)
 
 void readEEPROM() {
-  SSID = EEPROM.readString(ADDR_SSID);
-  PASS = EEPROM.readString(ADDR_PASS);
+  //SSID = EEPROM.readString(ADDR_SSID);
+  //PASS = EEPROM.readString(ADDR_PASS);
+  SSID= "AndroidAP9199";
+  PASS="Psk101104^";
   HOST = EEPROM.readString(ADDR_HOST);
-  /* UID = EEPROM.readString(ADDR_UID); */
-
-  char uidStr[15];
-  uint64_t chipid = ESP.getEfuseMac() >> 16;
-  snprintf(uidStr, 15, "ATES%04x", chipid);
-  UID = String(uidStr);
+  UID = EEPROM.readString(ADDR_UID);
   USER = EEPROM.readString(ADDR_USER);
   TS = EEPROM.readInt(ADDR_SAMPLING_RATE);
 
-  TEMP_MIN = EEPROM.readInt(TEMP_MIN_ADDR);
-  TEMP_MAX = EEPROM.readInt(TEMP_MAX_ADDR);
+  TEMP_MIN = EEPROM.readFloat(TEMP_MIN_ADDR);
+  TEMP_MAX = EEPROM.readFloat(TEMP_MAX_ADDR);
 
-  HUM_MIN = EEPROM.readInt(HUM_MIN_ADDR);
-  HUM_MAX = EEPROM.readInt(HUM_MAX_ADDR);
+  HUM_MIN = EEPROM.readFloat(HUM_MIN_ADDR);
+  HUM_MAX = EEPROM.readFloat(HUM_MAX_ADDR);
 
-  CO2_MIN = EEPROM.readInt(CO2_MIN_ADDR);
-  CO2_MAX = EEPROM.readInt(CO2_MAX_ADDR);
+  CO2_MIN = EEPROM.readFloat(CO2_MIN_ADDR);
+  CO2_MAX = EEPROM.readFloat(CO2_MAX_ADDR);
 
 }
 
@@ -85,9 +82,9 @@ void updateTS(const char *i) {
   EEPROM.commit();
 }
 
-void updateSetPoint(uint16_t addr, uint16_t min, uint16_t max) {
-  EEPROM.writeInt(addr, min);
-  EEPROM.writeInt(addr + 2, max);
+void updateSetPoint(uint16_t addr, float min, float max) {
+  EEPROM.writeFloat(addr, min);
+  EEPROM.writeFloat(addr + 2, max);
 
   EEPROM.commit();
 }

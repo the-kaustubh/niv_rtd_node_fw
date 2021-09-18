@@ -19,7 +19,7 @@ int postRequestWithTS(float t, float co2, float hum, uint32_t ts) {
       "\"temperature\":\"%0.2f\","
       "\"humidity\":\"%0.2f\","
       "\"co2\":\"%0.2f\","
-      "\"pressure\":\"0\","
+      //"\"pressure\":\"0\","
       "\"backup\": \"1\","
       "\"datetime\": \"%ld\""
       "}",
@@ -61,7 +61,8 @@ int postRequest(float t, float co2, float hum, int bat) {
       t,
       hum,
       co2,
-      bat%100
+      //bat%100
+      bat
       );
 
   Serial.println(postdata);
