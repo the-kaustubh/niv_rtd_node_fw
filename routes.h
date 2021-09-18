@@ -18,7 +18,7 @@
 
 const char CONF[] PROGMEM = "<!DOCTYPE html><html><head>"
 "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
-"<title>Configure</title><style>"
+"<title>ATES PVT LTD</title><style>"
 "body{font-family:Helvetica,Arial;}"
 "hr{color: #000; width:90%;border:none;}"
 "div{margin:20px auto;border:1px black solid;width:300px;"
@@ -31,7 +31,7 @@ const char CONF[] PROGMEM = "<!DOCTYPE html><html><head>"
 "<div><h1> Configure </h1>"
 "<input name='ssid' placeholder='SSID' value='__SSID__'>"
 "<input name='pass' placeholder='Password' value='__PASS__'><hr>"
-"<input name='uid' placeholder='UID' value='__UID__'>"
+"<input name='uid' placeholder='UID' value='__UID__' readonly>"
 "<input name='host' placeholder='URL' value='__HOST__'>"
 "<input name='user' placeholder='User' value='__USER__'>"
 "<input name='ts' placeholder='Sampling time' value='__TS__'>"
@@ -62,7 +62,7 @@ void handleNotFound() {
 void handleSave() {
   SAVE_PARAM("ssid", updateSSID);
   SAVE_PARAM("pass", updatePASS);
-  SAVE_PARAM("uid",  updateUID);
+  /* SAVE_PARAM("uid",  updateUID); */
   SAVE_PARAM("host",  updateHOST);
   SAVE_PARAM("user",  updateUSER);
   SAVE_PARAM("ts",   updateTS);

@@ -54,12 +54,6 @@ void setup() {
 
   checkWifi(1);
   Serial.println();
-  if(err) {
-    Serial.println("There was an error");
-#ifndef DEBUG
-    while(1);
-#endif
-  }
 
 #ifdef DHT_NODE
   DHT_init();
@@ -104,6 +98,12 @@ void setup() {
   pinMode(BATTERY_IN, INPUT);
   // Load setpoints
   fetchSetpoint();
+  if(err) {
+    Serial.println("There was an error");
+#ifndef DEBUG
+    while(1);
+#endif
+  }
 }
 
 void loop() {
@@ -116,32 +116,6 @@ void loop() {
   checkWifi(0);
 
   Serial.println();
-#ifdef RTD_NODE
-#ifdef DEBUG
-  temperature = 30.0;
-#else
-  temperature = thermo.temperature(RNOMINAL, RREF);
-  if(temperature > TEMP_MAX || temperature < TEMP_MIN) {
-    digitalWrite(BUZZER_PIN, HIGH);
-  } else {
-    digitalWrite(BUZZER_PIN, LOW);
-  }
-#endif
-#endif
-
-#ifdef CO2_NODE
-  if(!co2Sensor.isWarming()) {
-    co2 = co2Sensor.getPPM();
-    if(co2 > CO2_MAX || co2 < CO2_MIN) {
-      digitalWrite(BUZZER_PIN, HIGH);
-    } else {
-      digitalWrite(BUZZER_PIN, LOW);
-    }
-  } else {
-    Serial.println("Error: Sensor Communication Error in CO2");
-  }
-#endif
-
 #ifdef RTD_NODE
   Serial.println(temperature);
   checkFault();
@@ -173,27 +147,41 @@ void loop() {
   // Battery Reading
   battery = getBattery();
 
-#ifdef DHT_NODE
-  getValuesDHT(&dht_temp, &dht_hum);
-  if(dht_temp > TEMP_MAX || dht_temp < TEMP_MIN) {
-    digitalWrite(BUZZER_PIN, HIGH);
+  uint8_t allSensorsOK = 0;
+
+#ifdef RTD_NODE
+  temperature = thermo.temperature(RNOMINAL, RREF);
+  uint8_t rtd_ok = temperature > TEMP_MAX || temperature < TEMP_MIN
+  allSensorsOK += rtd_ok;
+#endif
+
+#ifdef CO2_NODE
+  if(!co2Sensor.isWarming()) {
+    co2 = co2Sensor.getPPM();
+    uint8_t co2_ok = co2 > CO2_MAX || co2 < CO2_MIN
+    allSensorsOK += co2_ok
   } else {
-    digitalWrite(BUZZER_PIN, LOW);
-  }
-  if(dht_hum > HUM_MAX || dht_hum < HUM_MIN) {
-    digitalWrite(BUZZER_PIN, HIGH);
-  } else {
-    digitalWrite(BUZZER_PIN, LOW);
+    Serial.println("Error: Sensor Communication Error in CO2");
   }
 #endif
 
+#ifdef DHT_NODE
+  getValuesDHT(&dht_temp, &dht_hum);
+  uint8_t dht_temp_ok = dht_temp > TEMP_MAX || dht_temp < TEMP_MIN;
+  uint8_t dht_hum_ok = dht_hum > HUM_MAX || dht_hum < HUM_MIN;
+  allSensorsOK += dht_temp_ok + dht_hum_ok;
+#endif
+
+  if(allSensorsOK) {
+    digitalWrite(BUZZER_PIN, HIGH);
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+  }
+
   n = getTime();
   uint32_t ts = 0;
-#ifdef DEBUG
-  ts = 1623718150;
-#else
+
   ts = n.unixtime();
-#endif
 
 
   storeData(ts,
