@@ -13,8 +13,8 @@
 
 #include "ArduinoJson-v6.18.3.h"
 
-//#define RTD_NODE
-//#define DHT_NODE 
+#define RTD_NODE
+//#define DHT_NODE
 #define CO2_NODE
 
 #define DEF_UID "000000"
@@ -41,7 +41,7 @@
 #define BATTERY_IN (36) // or 25
 #define BATTERY_CS (26)
 
-#define BUZZER_PIN (27) 
+#define BUZZER_PIN (27)
 //#define BUZZER_PIN (33)
 
 WebServer server(80);

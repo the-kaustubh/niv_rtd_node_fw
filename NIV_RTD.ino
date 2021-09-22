@@ -21,7 +21,7 @@ float dht_temp, dht_hum;
 #endif
 
 #ifdef RTD_NODE
-#include "temperature1.h"
+#include "temperature.h"
 #define RREF 430.0
 #define RNOMINAL 100.0
 uint32_t rtd;
@@ -102,25 +102,25 @@ void setup() {
 #endif
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(RTD_PIN, OUTPUT);
-  
-  
+
+
   pinMode(BATTERY_CS, OUTPUT);
   pinMode(BATTERY_IN, INPUT);
   digitalWrite(BUZZER_PIN, LOW);
-  
+
   // Load setpoints
-  
+
 }
 
 void loop() {
     setvalues=fetchSetpoint();
     digitalWrite(RTD_PIN, HIGH);
-    TEMP_MIN=setvalues[0] ; 
-    TEMP_MAX=setvalues[1] ; 
+    TEMP_MIN=setvalues[0] ;
+    TEMP_MAX=setvalues[1] ;
     HUM_MIN=setvalues[2] ;
-    HUM_MAX=setvalues[3] ; 
-    CO2_MIN=setvalues[4] ; 
-    CO2_MAX=setvalues[5] ; 
+    HUM_MAX=setvalues[3] ;
+    CO2_MIN=setvalues[4] ;
+    CO2_MAX=setvalues[5] ;
  /* HTTPClient http;
 
   String url = PROT + HOST + "/write/setpoints/" + UID; http.begin(url);
@@ -149,10 +149,7 @@ void loop() {
 
   Serial.println();
 #ifdef RTD_NODE
-#ifdef DEBUG
-  temperature = 30.0;
-#else
-  
+
   temperature = thermo.temperature(RNOMINAL, RREF);
   Serial.print("RTD temperature: ");
   Serial.println(temperature);
@@ -161,7 +158,6 @@ void loop() {
     } else {
       digitalWrite(BUZZER_PIN, LOW);
     }
-#endif
 #endif
 
 #ifdef CO2_NODE
@@ -202,8 +198,8 @@ void loop() {
 #else
       0,
 #endif
- 
-     
+
+
       battery=getBattery()
       );
 
@@ -212,7 +208,7 @@ void loop() {
 
 #ifdef DHT_NODE
   getValuesDHT(&dht_temp, &dht_hum);
-   
+
  /* HTTPClient http;
 
   String url = PROT + HOST + "/write/setpoints/" + UID; http.begin(url);
@@ -250,7 +246,7 @@ void loop() {
    int condition1=((dht_hum > HUM_MAX) || (dht_hum < HUM_MIN));
    Serial.println(condition1);
    digitalWrite(BUZZER_PIN, LOW);
-   Serial.println(BUZZER_PIN);  
+   Serial.println(BUZZER_PIN);
   if((dht_temp > TEMP_MAX) || (dht_temp < TEMP_MIN)) {
     temp_flag=1;
   } else {
@@ -266,11 +262,11 @@ void loop() {
     } else {
       digitalWrite(BUZZER_PIN, LOW);
     }
-    Serial.println("battery:="); 
+    Serial.println("battery:=");
     battery = getBattery();
-    Serial.println(battery); 
+    Serial.println(battery);
 #endif
- 
+
   n = getTime();
   uint32_t ts = 0;
 #ifdef DEBUG
