@@ -27,7 +27,12 @@ void readEEPROM() {
   SSID= "AndroidAP9199";
   PASS="Psk101104^";
   HOST = EEPROM.readString(ADDR_HOST);
-  UID = EEPROM.readString(ADDR_UID);
+
+  char uidStr[15];
+  uint64_t chipid = ESP.getEfuseMac() >> 16;
+  snprintf(uidStr, 15, "ATES%04x", chipid);
+  UID = String(uidStr);
+
   USER = EEPROM.readString(ADDR_USER);
   TS = EEPROM.readInt(ADDR_SAMPLING_RATE);
 
