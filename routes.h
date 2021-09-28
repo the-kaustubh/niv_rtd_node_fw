@@ -18,7 +18,7 @@
 
 const char CONF[] PROGMEM = "<!DOCTYPE html><html><head>"
 "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
-"<title>Configure</title><style>"
+"<title>ATES OPL</title><style>"
 "body{font-family:Helvetica,Arial;}"
 "hr{color: #000; width:90%;border:none;}"
 "div{margin:20px auto;border:1px black solid;width:300px;"
