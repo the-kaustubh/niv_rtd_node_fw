@@ -1,4 +1,3 @@
-
 #include "global.h"
 #include "sd.h"
 #include "rtc.h"
@@ -14,6 +13,8 @@
 #ifdef CO2_NODE
 #include "mh_z16_co2.h"
 #endif
+
+#define ABS(x) ((x<0) ? (-(x)) : (x))
 
 #ifdef DHT_NODE
 #include "dht.h"
@@ -34,6 +35,24 @@ float co2;
 
 /* #define DEBUG */
 
+#ifdef RTD_NODE
+float prev_temp = 0.0;
+#define TEMP_TH (0.5)
+#endif
+
+#ifdef DHT_NODE
+float prev_dht_temp = 0.0;
+float prev_dht_humidity = 0.0;
+#define DHT_TEMP_TH (0.5)
+#define DHT_HUM_TH (0.5)
+#endif
+
+#ifdef CO2_NODE
+float prev_co2 = 0.0;
+#define CO2_TH (0.5)
+#endif
+
+uint8_t isThresholdExceeded = 0;
 int battery = 0;
 DateTime n;
 
@@ -72,21 +91,6 @@ void setup() {
   server.onNotFound(handleNotFound);
 
   checkEEPROM();
-  Serial.println("=====EEPROM VALUES======");
-  Serial.print("SSID: ");
-  Serial.println(SSID);
-  Serial.print("PASS: ");
-  Serial.println(PASS);
-  Serial.print("UID: ");
-  Serial.println(UID);
-  Serial.print("USER: ");
-  Serial.println(USER);
-  Serial.print("HOST: ");
-  Serial.println(HOST);
-  Serial.println("=======================");
-  Serial.println();
-  Serial.println(WiFi.localIP());
-
   if(!MDNS.begin("esp")) {
     Serial.println("Error starting mDNS");
     return;
@@ -108,56 +112,47 @@ void setup() {
   pinMode(BATTERY_IN, INPUT);
   digitalWrite(BUZZER_PIN, LOW);
 
-  // Load setpoints
-
+  Serial.println("=====EEPROM VALUES======");
+  Serial.print("SSID: ");
+  Serial.println(SSID);
+  Serial.print("PASS: ");
+  Serial.println(PASS);
+  Serial.print("UID: ");
+  Serial.println(UID);
+  Serial.print("USER: ");
+  Serial.println(USER);
+  Serial.print("HOST: ");
+  Serial.println(HOST);
+  Serial.println("=======================");
+  Serial.println();
+  Serial.println(WiFi.localIP());
 }
 
 void loop() {
-    setvalues=fetchSetpoint();
-    digitalWrite(RTD_PIN, HIGH);
-    TEMP_MIN=setvalues[0] ;
-    TEMP_MAX=setvalues[1] ;
-    HUM_MIN=setvalues[2] ;
-    HUM_MAX=setvalues[3] ;
-    CO2_MIN=setvalues[4] ;
-    CO2_MAX=setvalues[5] ;
- /* HTTPClient http;
-
-  String url = PROT + HOST + "/write/setpoints/" + UID; http.begin(url);
-  http.addHeader("Accept", "application/json");
-
-  Serial.println(url);
-  int resp = http.GET();
-  String response = http.getString();
-  Serial.println(response);
-
-  DynamicJsonDocument json(1024);
-  deserializeJson(json, response);
-
-  float TEMP_MIN=json["temperaturemin"];
-  float TEMP_MAX=json["temperaturemax"];
-  http.end();*/
-  //Serial.println(TEMP_MIN);
- // Serial.println(TEMP_MAX);
-  //+ " " + TEMP_MAX);
-  //Serial.println(HUM_MIN + " " + HUM_MAX);
-  //Serial.println(CO2_MIN + " " + CO2_MAX);
+  setvalues=fetchSetpoint();
+  digitalWrite(RTD_PIN, HIGH);
+  TEMP_MIN=setvalues[0] ;
+  TEMP_MAX=setvalues[1] ;
+  HUM_MIN=setvalues[2] ;
+  HUM_MAX=setvalues[3] ;
+  CO2_MIN=setvalues[4] ;
+  CO2_MAX=setvalues[5] ;
   server.handleClient();
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
   checkWifi(0);
 
   Serial.println();
-#ifdef RTD_NODE
 
+#ifdef RTD_NODE
   temperature = thermo.temperature(RNOMINAL, RREF);
   Serial.print("RTD temperature: ");
   Serial.println(temperature);
   if(temperature > TEMP_MAX || temperature < TEMP_MIN) {
     digitalWrite(BUZZER_PIN, HIGH);
-    } else {
-      digitalWrite(BUZZER_PIN, LOW);
-    }
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+  }
 #endif
 
 #ifdef CO2_NODE
@@ -201,7 +196,7 @@ void loop() {
 
 
       battery=getBattery()
-      );
+        );
 
   // Battery Reading
   battery = getBattery();
@@ -209,62 +204,39 @@ void loop() {
 #ifdef DHT_NODE
   getValuesDHT(&dht_temp, &dht_hum);
 
- /* HTTPClient http;
-
-  String url = PROT + HOST + "/write/setpoints/" + UID; http.begin(url);
-  http.addHeader("Accept", "application/json");
-
-  Serial.println(url);
-  int resp = http.GET();
-  String response = http.getString();
-  Serial.println(response);
-
-  DynamicJsonDocument json(1024);
-  deserializeJson(json, response);
-
-  float TEMP_MIN=json["temperaturemin"];
-  float TEMP_MAX=json["temperaturemax"];
-  float HUM_MIN=json["humiditymin"];
-  float HUM_MAX=json["humiditymax"];
-  http.end();*/
-  //TEMP_MIN=fetchSetpoint();
   Serial.println("Current Temp:=");
   Serial.println(dht_temp);
   Serial.println("Min. Temp:=");
   Serial.println(TEMP_MIN);
   Serial.println("Max. Temp:=");
   Serial.println(TEMP_MAX);
-  int condition=(dht_temp > TEMP_MAX || dht_temp < TEMP_MIN);
-     Serial.println(condition);
 
-     Serial.println("Current Hum=");
+  Serial.println("Current Hum=");
   Serial.println(dht_hum);
   Serial.println("Min. hum:=");
   Serial.println(HUM_MIN);
   Serial.println("Max. hum:=");
   Serial.println(HUM_MAX);
-   int condition1=((dht_hum > HUM_MAX) || (dht_hum < HUM_MIN));
-   Serial.println(condition1);
-   digitalWrite(BUZZER_PIN, LOW);
-   Serial.println(BUZZER_PIN);
+  digitalWrite(BUZZER_PIN, LOW);
+
   if((dht_temp > TEMP_MAX) || (dht_temp < TEMP_MIN)) {
     temp_flag=1;
   } else {
     temp_flag=0;
   }
   if((dht_hum > HUM_MAX) || (dht_hum < HUM_MIN)) {
-   hum_flag=1;
- } else {
-   hum_flag=0;
+    hum_flag=1;
+  } else {
+    hum_flag=0;
   }
- if(temp_flag==1 || hum_flag==1||RTD_flag==1) {
-      digitalWrite(BUZZER_PIN, HIGH);
-    } else {
-      digitalWrite(BUZZER_PIN, LOW);
-    }
-    Serial.println("battery:=");
-    battery = getBattery();
-    Serial.println(battery);
+  if(temp_flag==1 || hum_flag==1||RTD_flag==1) {
+    digitalWrite(BUZZER_PIN, HIGH);
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+  }
+  Serial.println("battery:=");
+  battery = getBattery();
+  Serial.println(battery);
 #endif
 
   n = getTime();
@@ -275,29 +247,65 @@ void loop() {
   ts = n.unixtime();
 #endif
 
-
-  storeData(ts,
-#ifdef DHT_NODE
-      dht_temp
-#else
-      temperature
+#ifdef RTD_NODE
+  float diff_rtd = ABS((temperature - prev_temp));
+  if ( diff_rtd >= TEMP_TH ) {
+    isThresholdExceeded = 1;
+  }
 #endif
-      ,
+
+#ifdef DHT_NODE
+  float diff_dht_t = ABS((dht_temp - prev_dht_temp));
+  float diff_dht_h = ABS((dht_hum - prev_dht_humidity));
+  if (diff_dht_t >= DHT_TEMP_TH || diff_dht_h >= DHT_HUM_TH ) {
+    isThresholdExceeded = 1;
+  }
+#endif
+
 #ifdef CO2_NODE
-      co2
-#else
-      0.0
+  float diff_co2 = ABS((co2 - prev_co2));
+  if ( diff_co2 >= CO2_TH ) {
+    isThresholdExceeded = 1;
+  }
 #endif
-      ,
-#ifdef DHT_NODE
-      dht_hum
-#else
-      0.0
-#endif
-      ,
-      battery
-      );
 
+  if (isThresholdExceeded) {
+    storeData(ts,
+#ifdef DHT_NODE
+        dht_temp
+#else
+        temperature
+#endif
+        ,
+#ifdef CO2_NODE
+        co2
+#else
+        0.0
+#endif
+        ,
+#ifdef DHT_NODE
+        dht_hum
+#else
+        0.0
+#endif
+        ,
+        battery
+        );
+  }
+
+  #ifdef RTD_NODE
+  prev_temp = temperature;
+  #endif
+
+  #ifdef DHT_NODE
+  prev_dht_temp = dht_temp;
+  prev_dht_humidity = dht_hum;
+  #endif
+
+  #ifdef CO2_NODE
+  prev_co2 = co2;
+  #endif
+  isThresholdExceeded = 0;
 
   delay(TS * 1000);
 }
