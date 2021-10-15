@@ -8,11 +8,11 @@
 #include "lcd.h"
 #include "battery.h"
 #include "setpoints.h"
-/* #include "deep_sleep.h" */
 #define RTD_PIN 25
 #ifdef CO2_NODE
 #include "mh_z16_co2.h"
 #endif
+/* #include "deep_sleep.h" */
 
 #define ABS(x) ((x<0) ? (-(x)) : (x))
 
