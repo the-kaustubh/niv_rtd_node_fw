@@ -58,6 +58,9 @@ uint8_t isThresholdExceeded = 0;
 int battery = 0;
 DateTime n;
 
+int faultyFlag = 0;
+uint64_t buzzerTime;
+
 void setup() {
   Serial.begin(115200);
 #ifdef RTD_NODE
@@ -146,14 +149,15 @@ void loop() {
 
   Serial.println();
 
+  if (millis() - buzzerTime >= 5000) {
+    digitalWrite(BUZZER_PIN, LOW);
+  }
 #ifdef RTD_NODE
   temperature = thermo.temperature(RNOMINAL, RREF);
   Serial.print("RTD temperature: ");
   Serial.println(temperature);
   if(temperature > TEMP_MAX || temperature < TEMP_MIN) {
-    digitalWrite(BUZZER_PIN, HIGH);
-  } else {
-    digitalWrite(BUZZER_PIN, LOW);
+    faultyFlag += 1;
   }
 #endif
 
@@ -161,9 +165,7 @@ void loop() {
   if(!co2Sensor.isWarming()) {
     co2 = co2Sensor.getPPM();
     if(co2 > CO2_MAX || co2 < CO2_MIN) {
-      digitalWrite(BUZZER_PIN, HIGH);
-    } else {
-      digitalWrite(BUZZER_PIN, LOW);
+      faultyFlag += 1;
     }
   } else {
     Serial.println("Error: Sensor Communication Error in CO2");
@@ -222,24 +224,20 @@ void loop() {
   digitalWrite(BUZZER_PIN, LOW);
 
   if((dht_temp > TEMP_MAX) || (dht_temp < TEMP_MIN)) {
-    temp_flag=1;
-  } else {
-    temp_flag=0;
+    faultyFlag += 1;
   }
   if((dht_hum > HUM_MAX) || (dht_hum < HUM_MIN)) {
-    hum_flag=1;
-  } else {
-    hum_flag=0;
-  }
-  if(temp_flag==1 || hum_flag==1||RTD_flag==1) {
-    digitalWrite(BUZZER_PIN, HIGH);
-  } else {
-    digitalWrite(BUZZER_PIN, LOW);
+    faultyFlag += 1;
   }
   Serial.println("battery:=");
   battery = getBattery();
   Serial.println(battery);
 #endif
+  if(faultyFlag > 0) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    buzzerTime = millis();
+    faultyFlag = 0;
+  }
 
   n = getTime();
   uint32_t ts = 0;
