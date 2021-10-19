@@ -22,16 +22,16 @@
 #define HUM_MAX_ADDR (310)
 
 void readEEPROM() {
-  //SSID = EEPROM.readString(ADDR_SSID);
-  //PASS = EEPROM.readString(ADDR_PASS);
-  SSID= "AndroidAP9199";
-  PASS="Psk101104^";
+  SSID = EEPROM.readString(ADDR_SSID);
+  PASS = EEPROM.readString(ADDR_PASS);
+  /* SSID= "AndroidAP9199"; */
+  /* PASS="Psk101104^"; */
   HOST = EEPROM.readString(ADDR_HOST);
 
-  char uidStr[15];
-  uint64_t chipid = ESP.getEfuseMac() >> 16;
-  snprintf(uidStr, 15, "ATES%04x", chipid);
-  UID = String(uidStr);
+  /* char uidStr[15]; */
+  /* uint64_t chipid = ESP.getEfuseMac() >> 16; */
+  /* snprintf(uidStr, 15, "ATES%04x", chipid); */
+  UID = EEPROM.readString(ADDR_UID)
 
   USER = EEPROM.readString(ADDR_USER);
   TS = EEPROM.readInt(ADDR_SAMPLING_RATE);
