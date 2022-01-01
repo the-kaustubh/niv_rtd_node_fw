@@ -52,7 +52,7 @@ Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 14, 12, 13);
 //Adafruit_MAX31865 thermo = Adafruit_MAX31865(CS, SDI, SDO, clk);
 //Adafruit_MAX31865 thermo = Adafruit_MAX31865(15, 13, 12, 14);
 DHT dht(DHTPIN, DHTTYPE);
-uint16_t TS;
+uint16_t TS, STS;
 float TEMP_MIN, TEMP_MAX;
 float HUM_MIN, HUM_MAX;
 float CO2_MIN, CO2_MAX;

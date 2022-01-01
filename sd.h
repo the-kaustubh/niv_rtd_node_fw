@@ -13,7 +13,7 @@
 int sdBegin() {
   if(!SD.begin(CS_PIN)) {
     Serial.println("Card Mount Failed");
-    return 1;
+    return 0;
   }
   Serial.println("SD Card mounted successfully.");
   return 0;

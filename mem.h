@@ -10,6 +10,7 @@
 #define ADDR_HOST (110)
 #define ADDR_USER (170)
 #define ADDR_SAMPLING_RATE (220)
+#define ADDR_SEC_SAMPLING_RATE (230)
 #define ADDR_EEPROM_CONFIG (280)
 
 #define TEMP_MIN_ADDR (300)
@@ -31,10 +32,11 @@ void readEEPROM() {
   /* char uidStr[15]; */
   /* uint64_t chipid = ESP.getEfuseMac() >> 16; */
   /* snprintf(uidStr, 15, "ATES%04x", chipid); */
-  UID = EEPROM.readString(ADDR_UID)
+  UID = EEPROM.readString(ADDR_UID);
 
   USER = EEPROM.readString(ADDR_USER);
   TS = EEPROM.readInt(ADDR_SAMPLING_RATE);
+  STS = EEPROM.readInt(ADDR_SEC_SAMPLING_RATE);
 
   TEMP_MIN = EEPROM.readFloat(TEMP_MIN_ADDR);
   TEMP_MAX = EEPROM.readFloat(TEMP_MAX_ADDR);
@@ -54,7 +56,8 @@ void checkEEPROM() {
     EEPROM.writeString(ADDR_HOST, DEF_HOST);
     EEPROM.writeString(ADDR_UID, DEF_UID);
     EEPROM.writeString(ADDR_USER, DEF_USER);
-    EEPROM.writeInt(ADDR_SAMPLING_RATE, 3);
+    EEPROM.writeInt(ADDR_SAMPLING_RATE, 300);
+    EEPROM.writeInt(ADDR_SEC_SAMPLING_RATE, 60*60);
 
     EEPROM.writeByte(ADDR_EEPROM_CONFIG, 1);
     EEPROM.commit();
@@ -84,6 +87,11 @@ void updateUSER(const char *i) {
 }
 void updateTS(const char *i) {
   EEPROM.writeInt(ADDR_SAMPLING_RATE, atoi(i));
+  EEPROM.commit();
+}
+
+void updateSTS(const char *i) {
+  EEPROM.writeInt(ADDR_SEC_SAMPLING_RATE, atoi(i));
   EEPROM.commit();
 }
 

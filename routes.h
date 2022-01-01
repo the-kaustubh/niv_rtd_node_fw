@@ -35,6 +35,7 @@ const char CONF[] PROGMEM = "<!DOCTYPE html><html><head>"
 "<input name='host' placeholder='URL' value='__HOST__'>"
 "<input name='user' placeholder='User' value='__USER__'>"
 "<input name='ts' placeholder='Sampling time' value='__TS__'>"
+"<input name='sts' placeholder='Secondary Sampling time' value='__STS__'>"
 "<input class='subm' type='submit' value=' OK '> <hr>"
 "</div></form</body></html>";
 
@@ -51,6 +52,7 @@ void handleRoot() {
   Page.replace("__UID__", UID);
   Page.replace("__USER__", USER);
   Page.replace("__TS__", String(TS));
+  Page.replace("__STS__", String(STS));
   server.send(200, "text/html", Page);
 
 }
@@ -66,6 +68,7 @@ void handleSave() {
   SAVE_PARAM("host",  updateHOST);
   SAVE_PARAM("user",  updateUSER);
   SAVE_PARAM("ts",   updateTS);
+  SAVE_PARAM("sts",   updateSTS);
 
   server.send(201, "text/html", "Your config was saved <a href='/'>Go back</a>");
   ESP.restart();

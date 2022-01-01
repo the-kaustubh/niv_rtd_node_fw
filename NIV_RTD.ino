@@ -16,8 +16,6 @@
 
 #define ABS(x) ((x<0) ? (-(x)) : (x))
 
-#define ABS(x) ((x<0) ? (-(x)) : (x))
-
 #ifdef DHT_NODE
 #include "dht.h"
 float dht_temp, dht_hum;
