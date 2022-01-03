@@ -12,7 +12,6 @@
 #ifdef CO2_NODE
 #include "mh_z16_co2.h"
 #endif
-/* #include "deep_sleep.h" */
 
 #define ABS(x) ((x<0) ? (-(x)) : (x))
 
@@ -32,8 +31,6 @@ float temperature;
 #ifdef CO2_NODE
 float co2;
 #endif
-
-/* #define DEBUG */
 
 #ifdef RTD_NODE
 float prev_temp = 0.0;
@@ -206,17 +203,12 @@ void setup() {
     return;
   }
 
-  /* esp_sleep_enable_timer_wakeup(TS * uS_to_S); */
-  /* Serial.println("Setup ESP32 to sleep for every " + String(TS) + */
-  /* " Seconds"); */
-  /* esp_deep_sleep_start(); */
   delay(20000);
 #ifdef RTD_NODE
   rtd = thermo.readRTD();
 #endif
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(RTD_PIN, OUTPUT);
-
 
   pinMode(BATTERY_CS, OUTPUT);
   pinMode(BATTERY_IN, INPUT);
