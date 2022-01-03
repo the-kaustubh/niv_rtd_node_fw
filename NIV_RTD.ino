@@ -17,7 +17,7 @@
 #define ABS(x) ((x<0) ? (-(x)) : (x))
 
 #ifdef DHT_NODE
-#include "dht.h"
+#include "sht.h"
 float dht_temp, dht_hum;
 #endif
 
@@ -57,7 +57,114 @@ int battery = 0;
 DateTime n;
 
 int faultyFlag = 0;
+uint8_t buzzerFlag = 0;
 uint64_t buzzerTime;
+
+uint64_t lastSend = 0;
+
+void FetchAllSetpoints() {
+  setvalues=fetchSetpoint();
+  TEMP_MIN=setvalues[0];
+  TEMP_MAX=setvalues[1];
+  HUM_MIN=setvalues[2];
+  HUM_MAX=setvalues[3];
+  CO2_MIN=setvalues[4];
+  CO2_MAX=setvalues[5];
+}
+
+void ReadAllPeripherals() {
+
+#ifdef RTD_NODE
+  temperature = thermo.temperature(RNOMINAL, RREF);
+  Serial.print("RTD temperature: ");
+  Serial.println(temperature);
+  if(temperature > TEMP_MAX || temperature < TEMP_MIN) {
+    faultyFlag += 1;
+  }
+  Serial.println(temperature);
+  checkFault();
+  Serial.println();
+#endif
+
+#ifdef CO2_NODE
+  if(!co2Sensor.isWarming()) {
+    co2 = co2Sensor.getPPM();
+    if(co2 > CO2_MAX || co2 < CO2_MIN) {
+      faultyFlag += 1;
+    }
+  } else {
+    Serial.println("Error: Sensor Communication Error in CO2");
+  }
+#endif
+
+#ifdef DHT_NODE
+  getValuesDHT(&dht_temp, &dht_hum);
+
+  if((dht_temp > TEMP_MAX) || (dht_temp < TEMP_MIN)) {
+    faultyFlag += 1;
+  }
+  if((dht_hum > HUM_MAX) || (dht_hum < HUM_MIN)) {
+    faultyFlag += 1;
+  }
+#endif
+  Serial.println("battery:=");
+  battery = getBattery();
+  Serial.println(battery);
+}
+
+void displaySetpoints() {
+  Serial.print("Min. Temp:=");
+  Serial.println(TEMP_MIN);
+  Serial.print("Max. Temp:=");
+  Serial.println(TEMP_MAX);
+
+  Serial.print("Min. hum:=");
+  Serial.println(HUM_MIN);
+  Serial.print("Max. hum:=");
+  Serial.println(HUM_MAX);
+}
+
+void loopRefresh() {
+  #ifdef RTD_NODE
+  prev_temp = temperature;
+  #endif
+
+  #ifdef DHT_NODE
+  prev_dht_temp = dht_temp;
+  prev_dht_humidity = dht_hum;
+  #endif
+
+  #ifdef CO2_NODE
+  prev_co2 = co2;
+  #endif
+
+  faultyFlag = 0;
+  isThresholdExceeded = 0;
+}
+
+void checkThreshold() {
+#ifdef RTD_NODE
+  float diff_rtd = ABS((temperature - prev_temp));
+  if ( diff_rtd >= TEMP_TH ) {
+    isThresholdExceeded = 1;
+  }
+#endif
+
+#ifdef DHT_NODE
+  float diff_dht_t = ABS((dht_temp - prev_dht_temp));
+  float diff_dht_h = ABS((dht_hum - prev_dht_humidity));
+  if (diff_dht_t >= DHT_TEMP_TH || diff_dht_h >= DHT_HUM_TH ) {
+    isThresholdExceeded = 1;
+  }
+#endif
+
+#ifdef CO2_NODE
+  float diff_co2 = ABS((co2 - prev_co2));
+  if ( diff_co2 >= CO2_TH ) {
+    isThresholdExceeded = 1;
+  }
+#endif
+}
 
 void setup() {
   Serial.begin(115200);
@@ -132,49 +239,15 @@ void setup() {
 }
 
 void loop() {
-  setvalues=fetchSetpoint();
-  digitalWrite(RTD_PIN, HIGH);
-  TEMP_MIN=setvalues[0] ;
-  TEMP_MAX=setvalues[1] ;
-  HUM_MIN=setvalues[2] ;
-  HUM_MAX=setvalues[3] ;
-  CO2_MIN=setvalues[4] ;
-  CO2_MAX=setvalues[5] ;
   server.handleClient();
+  FetchAllSetpoints();
+  digitalWrite(RTD_PIN, HIGH);
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
   checkWifi(0);
-
   Serial.println();
 
-  if (millis() - buzzerTime >= 5000) {
-    digitalWrite(BUZZER_PIN, LOW);
-  }
-#ifdef RTD_NODE
-  temperature = thermo.temperature(RNOMINAL, RREF);
-  Serial.print("RTD temperature: ");
-  Serial.println(temperature);
-  if(temperature > TEMP_MAX || temperature < TEMP_MIN) {
-    faultyFlag += 1;
-  }
-#endif
-
-#ifdef CO2_NODE
-  if(!co2Sensor.isWarming()) {
-    co2 = co2Sensor.getPPM();
-    if(co2 > CO2_MAX || co2 < CO2_MIN) {
-      faultyFlag += 1;
-    }
-  } else {
-    Serial.println("Error: Sensor Communication Error in CO2");
-  }
-#endif
-
-#ifdef RTD_NODE
-  Serial.println(temperature);
-  checkFault();
-  Serial.println();
-#endif
+  ReadAllPeripherals();
 
   displayUpdate(
       // Temperature and Humidity
@@ -188,85 +261,27 @@ void loop() {
       0,
       0,
 #endif
-
       // CO2
 #if defined(CO2_NODE)
       co2,
 #else
       0,
 #endif
+      battery
+      );
 
-
-      battery=getBattery()
-        );
-
-  // Battery Reading
-  battery = getBattery();
-
-#ifdef DHT_NODE
-  getValuesDHT(&dht_temp, &dht_hum);
-
-  Serial.println("Current Temp:=");
-  Serial.println(dht_temp);
-  Serial.println("Min. Temp:=");
-  Serial.println(TEMP_MIN);
-  Serial.println("Max. Temp:=");
-  Serial.println(TEMP_MAX);
-
-  Serial.println("Current Hum=");
-  Serial.println(dht_hum);
-  Serial.println("Min. hum:=");
-  Serial.println(HUM_MIN);
-  Serial.println("Max. hum:=");
-  Serial.println(HUM_MAX);
-  digitalWrite(BUZZER_PIN, LOW);
-
-  if((dht_temp > TEMP_MAX) || (dht_temp < TEMP_MIN)) {
-    faultyFlag += 1;
-  }
-  if((dht_hum > HUM_MAX) || (dht_hum < HUM_MIN)) {
-    faultyFlag += 1;
-  }
-  Serial.println("battery:=");
-  battery = getBattery();
-  Serial.println(battery);
-#endif
   if(faultyFlag > 0) {
     digitalWrite(BUZZER_PIN, HIGH);
-    buzzerTime = millis();
-    faultyFlag = 0;
+    delay(20 * 1000);
+    digitalWrite(BUZZER_PIN, LOW);
   }
 
   n = getTime();
-  uint32_t ts = 0;
-#ifdef DEBUG
-  ts = 1623718150;
-#else
-  ts = n.unixtime();
-#endif
+  uint32_t ts = n.unixtime();
 
-#ifdef RTD_NODE
-  float diff_rtd = ABS((temperature - prev_temp));
-  if ( diff_rtd >= TEMP_TH ) {
-    isThresholdExceeded = 1;
-  }
-#endif
+  checkThreshold();
 
-#ifdef DHT_NODE
-  float diff_dht_t = ABS((dht_temp - prev_dht_temp));
-  float diff_dht_h = ABS((dht_hum - prev_dht_humidity));
-  if (diff_dht_t >= DHT_TEMP_TH || diff_dht_h >= DHT_HUM_TH ) {
-    isThresholdExceeded = 1;
-  }
-#endif
-
-#ifdef CO2_NODE
-  float diff_co2 = ABS((co2 - prev_co2));
-  if ( diff_co2 >= CO2_TH ) {
-    isThresholdExceeded = 1;
-  }
-#endif
-
+  loopRefresh();
   if (isThresholdExceeded) {
     storeData(ts,
 #ifdef DHT_NODE
@@ -289,21 +304,34 @@ void loop() {
         ,
         battery
         );
+    delay(TS * 1000);
   }
+  else {
+    uint64_t diff = millis() - lastSend;
+    uint64_t STS_millis = STS * 1000;
 
-  #ifdef RTD_NODE
-  prev_temp = temperature;
-  #endif
-
-  #ifdef DHT_NODE
-  prev_dht_temp = dht_temp;
-  prev_dht_humidity = dht_hum;
-  #endif
-
-  #ifdef CO2_NODE
-  prev_co2 = co2;
-  #endif
-  isThresholdExceeded = 0;
-
-  delay(TS * 1000);
+    if(ABS(diff) >= STS) {
+      storeData(ts,
+#ifdef DHT_NODE
+          dht_temp
+#else
+          temperature
+#endif
+          ,
+#ifdef CO2_NODE
+          co2
+#else
+          0.0
+#endif
+          ,
+#ifdef DHT_NODE
+          dht_hum
+#else
+          0.0
+#endif
+          ,
+          battery
+          );
+    }
+  }
 }
