@@ -55,7 +55,7 @@ DateTime n;
 
 int faultyFlag = 0;
 uint8_t buzzerFlag = 0;
-uint64_t buzzerTime;
+uint8_t buzzerDone = 0;
 
 uint64_t lastSend = 0;
 
@@ -104,6 +104,9 @@ void ReadAllPeripherals() {
     faultyFlag += 1;
   }
 #endif
+  if (!faultyFlag && buzzerDone) {
+    buzzerDone = 0;
+  }
   Serial.println("battery:=");
   battery = getBattery();
   Serial.println(battery);
@@ -262,10 +265,11 @@ void loop() {
       battery
       );
 
-  if(faultyFlag > 0) {
+  if(faultyFlag > 0 && !buzzerDone) {
     digitalWrite(BUZZER_PIN, HIGH);
     delay(20 * 1000);
     digitalWrite(BUZZER_PIN, LOW);
+    buzzerDone = 1;
   }
 
   n = getTime();
