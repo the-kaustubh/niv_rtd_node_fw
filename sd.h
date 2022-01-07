@@ -13,8 +13,11 @@
 int sdBegin() {
   if(!SD.begin(CS_PIN)) {
     Serial.println("Card Mount Failed");
+    Serial.println("Continuing without SD card");
+    usingSD = 0;
     return 0;
   }
+  usingSD = 1;
   Serial.println("SD Card mounted successfully.");
   return 0;
 }
@@ -29,6 +32,7 @@ int readingsPresent() {
 int writeReading(uint32_t tstamp, float temperature, float co2, float hum) {
   File ts;
   char tsr[40];
+  if (!usingSD) return 1;
   if(readingsPresent()) {
     ts = SD.open(FILE_SAVE, FILE_APPEND);
   } else {
@@ -36,7 +40,7 @@ int writeReading(uint32_t tstamp, float temperature, float co2, float hum) {
   }
   if ( !ts ) {
     Serial.println("Couldn't open File");
-    return 0;
+    return 1;
   }
   snprintf(tsr, 40, "%ld,%2.2f,%2.2f,%2.2f\n", tstamp, temperature, co2, hum);
   Serial.println(tsr);
@@ -49,14 +53,18 @@ int writeReading(uint32_t tstamp, float temperature, float co2, float hum) {
 	Serial.println(" bytes were written.");
 	Serial.println("Closing file /readings");
 	ts.close();
+  return 0;
 }
 
 int clearFile(const char * file) {
+  if(!usingSD) return 1;
   SD.remove(file);
+  return 0;
 }
 
 String readAllTimestamps() {
   String fmt = "";
+  if (!usingSD)  return ""
 	File ts = SD.open(FILE_SAVE, FILE_READ);
 	if(!ts) {
 		Serial.println("File Not Found.");

@@ -32,7 +32,7 @@
 //#define DEF_PASS ("Sanjay1969")
 
 #define PROT "http://"
-#define ENDPOINT "/write/reading"
+#define ENDPOINT "/server/write/reading"
 
 #define uS_to_S (1000000)
 
@@ -50,14 +50,16 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 String SSID, PASS;
 String HOST, UID, USER;
 Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 14, 12, 13);
-//Adafruit_MAX31865 thermo = Adafruit_MAX31865(CS, SDI, SDO, clk);
-//Adafruit_MAX31865 thermo = Adafruit_MAX31865(15, 13, 12, 14);
 Adafruit_SHT31 sht31 = Adafruit_SHT31();
 DHT dht(DHTPIN, DHTTYPE);
+//Adafruit_MAX31865 thermo = Adafruit_MAX31865(CS, SDI, SDO, clk);
+//Adafruit_MAX31865 thermo = Adafruit_MAX31865(15, 13, 12, 14);
+
 uint16_t TS, STS;
 float TEMP_MIN, TEMP_MAX;
 float HUM_MIN, HUM_MAX;
 float CO2_MIN, CO2_MAX;
 float *setvalues;
 int temp_flag=0, hum_flag=0, RTD_flag=0, CO2_flag=0;
+uint8_t usingSD = 1;
 #endif
