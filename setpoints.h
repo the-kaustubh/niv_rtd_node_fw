@@ -6,7 +6,7 @@
 float * fetchSetpoint(void) {
   HTTPClient http;
 
-  String url = PROT + HOST + "/write/setpoints/" + UID;
+  String url = PROT + HOST + "/server/write/setpoints/" + UID;
   http.begin(url);
   http.addHeader("Accept", "application/json");
 
