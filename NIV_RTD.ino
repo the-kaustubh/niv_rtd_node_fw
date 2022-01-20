@@ -201,7 +201,8 @@ void setup() {
   server.onNotFound(handleNotFound);
 
   checkEEPROM();
-  if(!MDNS.begin("esp")) {
+  String HOSTNAME = "ATECHNO" + UID;
+  if(!MDNS.begin(HOSTNAME.c_str())) {
     Serial.println("Error starting mDNS");
     return;
   }

@@ -17,10 +17,10 @@ void displayUpdate(float temperature, float humidity, float co2,  float battery)
   lcd.setCursor(0, 1);
   // =======
   if(WiFi.status() == WL_CONNECTED) {
-    lcd.print("N/W OK ");
+    lcd.print("Signal Strength: HI");
     /* lcd.print(WiFi.localIP()); */
   } else {
-    lcd.print("Offline");
+    lcd.print("Signal Strength: LO");
   }
   // =======
   lcd.setCursor(0, 2);

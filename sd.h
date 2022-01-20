@@ -64,7 +64,7 @@ int clearFile(const char * file) {
 
 String readAllTimestamps() {
   String fmt = "";
-  if (!usingSD)  return ""
+  if (!usingSD)  return "";
 	File ts = SD.open(FILE_SAVE, FILE_READ);
 	if(!ts) {
 		Serial.println("File Not Found.");
