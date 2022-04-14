@@ -208,8 +208,8 @@ void checkThreshold() {
   if ( diff_NO >= NO_TH ) {
     isThresholdExceeded = 1;
   }
-  float diff_H2s = ABS((H2s - prev_H2s));
-  if ( diff_H2s >= H2s_TH ) {
+  float diff_H2S = ABS((H2S - prev_H2S));
+  if ( diff_H2S >= H2S_TH ) {
     isThresholdExceeded = 1;
   }
 #endif
@@ -259,9 +259,9 @@ void setup() {
   delay(20000);
 #ifdef RTD_NODE
   rtd = thermo.readRTD();
+  pinMode(RTD_PIN, OUTPUT);
 #endif
   pinMode(BUZZER_PIN, OUTPUT);
-  pinMode(RTD_PIN, OUTPUT);
 
   pinMode(BATTERY_CS, OUTPUT);
   pinMode(BATTERY_IN, INPUT);
@@ -286,7 +286,9 @@ void setup() {
 void loop() {
   server.handleClient();
   FetchAllSetpoints();
+#ifdef RTD_NODE
   digitalWrite(RTD_PIN, HIGH);
+#endif
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
   checkWifi(0);
@@ -305,17 +307,17 @@ void loop() {
 #elif defined(CO2_NODE)
       0,
       0,
+#elif defined(MQ_NODE)
+      CO,
+      NO,
 #endif
       // CO2
 #if defined(CO2_NODE)
       co2,
+#elif defined(MQ_NODE)
+      H2S,
 #else
       0,
-#endif
-#ifdef MQ_NODE
-  CO,
-  NO,
-  H2S,
 #endif
       battery
       );
@@ -337,25 +339,26 @@ void loop() {
     storeData(ts,
 #ifdef DHT_NODE
         dht_temp
-#else
+#elif defined(RTD_NODE)
         temperature
+#else
+        CO
 #endif
         ,
 #ifdef CO2_NODE
         co2
+#elif defined(MQ_NODE)
+        H2S
 #else
         0.0
 #endif
         ,
 #ifdef DHT_NODE
         dht_hum
+#elif defined(MQ_NODE)
+        NO
 #else
         0.0
-#endif
-#ifdef MQ_NODE
-  CO,
-  NO,
-  H2S
 #endif
         ,
         battery
@@ -370,25 +373,26 @@ void loop() {
       storeData(ts,
 #ifdef DHT_NODE
           dht_temp
+#elif defined(MQ_NODE)
+          CO
 #else
           temperature
 #endif
           ,
 #ifdef CO2_NODE
           co2
+#elif defined(MQ_NODE)
+          H2S
 #else
           0.0
 #endif
           ,
 #ifdef DHT_NODE
           dht_hum
+#elif defined(MQ_NODE)
+          NO
 #else
           0.0
-#endif
-#ifdef MQ_NODE
-  CO,
-  NO,
-  H2S
 #endif
           ,
           battery

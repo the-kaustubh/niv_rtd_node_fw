@@ -24,10 +24,10 @@ class GasSensor {
     float volts = (((float)value)/1024)*maxVolt;
     float RS_gas = (maxVolt - volts)/volts;
     float R0 = RS_gas / this->R0_factor;
-    this->currentValue = R0
+    this->currentValue = R0;
     return R0;
   }
 
-}
+};
 
 #endif
