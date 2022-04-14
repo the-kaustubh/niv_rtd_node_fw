@@ -38,11 +38,29 @@ void displayUpdate(float temperature, float humidity, float co2,  float battery)
   lcd.print(" %");
   lcd.print(" ");
 #endif
-  lcd.setCursor(0, 3);
 #if defined(CO2_NODE)
+  lcd.setCursor(0, 3);
   lcd.print("CO2: ");
   lcd.print(co2);
 #endif
+
+#if defined(MQ_NODE)
+  lcd.print("CO: ");
+  lcd.print(temperature);
+  lcd.print(" ppm");
+  lcd.print(" ");
+  lcd.print("NO: ");
+  lcd.print(humidity);
+  lcd.print(" ppm");
+  lcd.print(" ");
+
+  lcd.setCursor(0, 3);
+  lcd.print("H2S: ");
+  lcd.print(co2);
+  lcd.print(" ppm");
+  lcd.print(" ");
+#endif
+
   // =======
   lcd.print("BAT: ");
   lcd.print(battery);

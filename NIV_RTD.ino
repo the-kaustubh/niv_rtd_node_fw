@@ -8,36 +8,23 @@
 #include "lcd.h"
 #include "battery.h"
 #include "setpoints.h"
-#define RTD_PIN 25
-#ifdef CO2_NODE
-#include "mh_z16_co2.h"
-#endif
 
 #define ABS(x) ((x<0) ? (-(x)) : (x))
 
-#ifdef DHT_NODE
-#include "sht.h"
-float dht_temp, dht_hum;
-#endif
-
 #ifdef RTD_NODE
+#define RTD_PIN 25
 #include "temperature.h"
 #define RREF 430.0
 #define RNOMINAL 100.0
 uint32_t rtd;
 float temperature;
-#endif
-
-#ifdef CO2_NODE
-float co2;
-#endif
-
-#ifdef RTD_NODE
 float prev_temp = 0.0;
 #define TEMP_TH (0.5)
 #endif
 
 #ifdef DHT_NODE
+#include "sht.h"
+float dht_temp, dht_hum;
 float prev_dht_temp = 0.0;
 float prev_dht_humidity = 0.0;
 #define DHT_TEMP_TH (0.5)
@@ -45,8 +32,26 @@ float prev_dht_humidity = 0.0;
 #endif
 
 #ifdef CO2_NODE
+#include "mh_z16_co2.h"
+float co2;
 float prev_co2 = 0.0;
 #define CO2_TH (0.5)
+#endif
+
+#ifdef MQ_NODE
+
+#include "mq.h"
+float prev_CO = 0.0;
+float prev_NO = 0.0;
+float prev_H2S = 0.0;
+
+float CO = 0.0;
+float NO = 0.0;
+float H2S = 0.0;
+
+  #define CO_TH (0.5)
+  #define NO_TH (0.5)
+  #define H2S_TH (0.5)
 #endif
 
 uint8_t isThresholdExceeded = 0;
@@ -61,12 +66,29 @@ uint64_t lastSend = 0;
 
 void FetchAllSetpoints() {
   setvalues=fetchSetpoint();
+#ifdef RTD_NODE
+  TEMP_MIN=setvalues[0];
+  TEMP_MAX=setvalues[1];
+#endif
+#ifdef DHT_NODE
   TEMP_MIN=setvalues[0];
   TEMP_MAX=setvalues[1];
   HUM_MIN=setvalues[2];
   HUM_MAX=setvalues[3];
+#endif
+#ifdef CO2_NODE
   CO2_MIN=setvalues[4];
   CO2_MAX=setvalues[5];
+#endif
+
+#ifdef MQ_NODE
+  CO_MIN=setvalues[0];
+  CO_MAX=setvalues[1];
+  NO_MIN=setvalues[2];
+  NO_MAX=setvalues[3];
+  H2S_MIN=setvalues[4];
+  H2S_MAX=setvalues[5];
+#endif
 }
 
 void ReadAllPeripherals() {
@@ -104,6 +126,23 @@ void ReadAllPeripherals() {
     faultyFlag += 1;
   }
 #endif
+
+#ifdef MQ_NODE
+  CO = mq_co.readValue(3.3);
+  NO = mq_co.readValue(3.3);
+  H2S = mq_co.readValue(3.3);
+
+  if((CO > CO_MAX) || (CO < CO_MIN)) {
+    faultyFlag += 1;
+  }
+  if((NO > NO_MAX) || (NO < NO_MIN)) {
+    faultyFlag += 1;
+  }
+  if((H2S > H2S_MAX) || (H2S < H2S_MIN)) {
+    faultyFlag += 1;
+  }
+#endif
+
   if (!faultyFlag && buzzerDone) {
     buzzerDone = 0;
   }
@@ -112,17 +151,6 @@ void ReadAllPeripherals() {
   Serial.println(battery);
 }
 
-void displaySetpoints() {
-  Serial.print("Min. Temp:=");
-  Serial.println(TEMP_MIN);
-  Serial.print("Max. Temp:=");
-  Serial.println(TEMP_MAX);
-
-  Serial.print("Min. hum:=");
-  Serial.println(HUM_MIN);
-  Serial.print("Max. hum:=");
-  Serial.println(HUM_MAX);
-}
 
 void loopRefresh() {
   #ifdef RTD_NODE
@@ -136,6 +164,12 @@ void loopRefresh() {
 
   #ifdef CO2_NODE
   prev_co2 = co2;
+  #endif
+
+  #ifdef MQ_NODE
+  prev_NO = NO;
+  prev_CO = NO;
+  prev_H2S = H2S;
   #endif
 
   faultyFlag = 0;
@@ -161,6 +195,21 @@ void checkThreshold() {
 #ifdef CO2_NODE
   float diff_co2 = ABS((co2 - prev_co2));
   if ( diff_co2 >= CO2_TH ) {
+    isThresholdExceeded = 1;
+  }
+#endif
+
+#ifdef MQ_NODE
+  float diff_CO = ABS((CO - prev_CO));
+  if ( diff_CO >= CO_TH ) {
+    isThresholdExceeded = 1;
+  }
+  float diff_NO = ABS((NO - prev_NO));
+  if ( diff_NO >= NO_TH ) {
+    isThresholdExceeded = 1;
+  }
+  float diff_H2s = ABS((H2s - prev_H2s));
+  if ( diff_H2s >= H2s_TH ) {
     isThresholdExceeded = 1;
   }
 #endif
@@ -263,6 +312,11 @@ void loop() {
 #else
       0,
 #endif
+#ifdef MQ_NODE
+  CO,
+  NO,
+  H2S,
+#endif
       battery
       );
 
@@ -298,6 +352,11 @@ void loop() {
 #else
         0.0
 #endif
+#ifdef MQ_NODE
+  CO,
+  NO,
+  H2S
+#endif
         ,
         battery
         );
@@ -325,6 +384,11 @@ void loop() {
           dht_hum
 #else
           0.0
+#endif
+#ifdef MQ_NODE
+  CO,
+  NO,
+  H2S
 #endif
           ,
           battery

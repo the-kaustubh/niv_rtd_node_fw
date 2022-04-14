@@ -17,31 +17,54 @@ float * fetchSetpoint(void) {
 
   DynamicJsonDocument json(1024);
   deserializeJson(json, response);
+  http.end();
 
+
+#ifdef RTD_NODE
+  float TEMP_MIN = json["temperaturemin"];
+  float TEMP_MAX = json["temperaturemax"];
+#endif
+
+#ifdef DHT_NODE
   float TEMP_MIN = json["temperaturemin"];
   float TEMP_MAX = json["temperaturemax"];
   float HUM_MIN = json["humiditymin"];
   float HUM_MAX = json["humiditymax"];
+#endif
+
+#ifdef CO2_NODE
   float CO2_MIN = json["co2min"];
   float CO2_MAX = json["co2max"];
+#endif
 
-  Serial.println("+++++++++JSON DATA++++++++++");
-  Serial.println("Min. Temp:=");
-  Serial.println(TEMP_MIN);
-  Serial.println("Max. Temp:=");
-  Serial.println(TEMP_MAX);
-  Serial.println("Min. HUM:=");
-  Serial.println(HUM_MIN);
-  Serial.println("Max. HUM:=");
-  Serial.println(HUM_MAX);
-  Serial.println("++++++++++++++++++++++++++++");
+#ifdef MQ_NODE
+  float CO_MIN = json["temperaturemax"];
+  float CO_MAX = json["temperaturemin"];
 
+  float NO_MIN = json["humiditymin"];
+  float NO_MAX = json["humiditymax"];
+
+  float H2S_MIN = json["co2min"];
+  float H2S_MAX = json["co2max"];
+#endif
+
+#ifdef RTD_NODE
   updateSetPoint(TEMP_MIN_ADDR, json['temperaturemin'], json['temperaturemax']);
-  // updateSetPoint(TEMP_MIN_ADDR,20,30);
+#endif
+#ifdef DHT_NODE
+  updateSetPoint(TEMP_MIN_ADDR, json['temperaturemin'], json['temperaturemax']);
+  updateSetPoint(HUM_MIN_ADDR, json['humiditymin'], json['humiditymax']);
+#endif
+#ifdef CO2_NODE
+  updateSetPoint(CO2_MIN_ADDR, json['co2min'], json['co2max']);
+#endif
+#ifdef MQ_NODE
+  updateSetPoint(TEMP_MIN_ADDR, json['temperaturemin'], json['temperaturemax']);
   updateSetPoint(HUM_MIN_ADDR, json['humiditymin'], json['humiditymax']);
   updateSetPoint(CO2_MIN_ADDR, json['co2min'], json['co2max']);
+#endif
+  // updateSetPoint(TEMP_MIN_ADDR,20,30);
 
-  http.end();
   static float setvalues[6];
   setvalues[0] = TEMP_MIN;
   setvalues[1] = TEMP_MAX;
