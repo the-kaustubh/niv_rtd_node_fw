@@ -129,8 +129,8 @@ void ReadAllPeripherals() {
 
 #ifdef MQ_NODE
   CO = mq_co.readValue(3.3);
-  NO = mq_co.readValue(3.3);
-  H2S = mq_co.readValue(3.3);
+  NO = mq_no.readValue(3.3);
+  H2S = mq_h2s.readValue(3.3);
 
   if((CO > CO_MAX) || (CO < CO_MIN)) {
     faultyFlag += 1;
